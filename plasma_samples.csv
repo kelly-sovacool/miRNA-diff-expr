@@ -1,0 +1,101 @@
+,Participant.ID,Age,Gender,Race,Source
+X1,70014,23.0,Male,Asian,Plasma
+X2,70016,39.0,Male,White,Plasma
+X3,70028,33.0,Female,White,Plasma
+X4,70029,27.0,Female,African American,Plasma
+X5,70038,22.0,Female,White,Plasma
+X6,70057,31.0,Male,Asian,Plasma
+X7,70067,29.0,Male,White,Plasma
+X8,70082,24.0,Male,White,Plasma
+X9,70092,25.0,Male,Asian,Plasma
+X10,70103,22.0,Male,Asian,Plasma
+X11,70105,40.0,Male,White,Plasma
+X14,70125,30.0,Female,White,Plasma
+X15,70182,33.0,Female,White,Plasma
+X16,70283,21.0,Female,Asian,Plasma
+X17,70287,26.0,Female,Asian,Plasma
+X18,70348,27.0,Female,African American,Plasma
+X19,70362,33.0,Female,Asian,Plasma
+X20,70406,29.0,Male,White,Plasma
+X21,70416,31.0,Male,White,Plasma
+X22,70435,24.0,Female,White,Plasma
+X23,70467,35.0,Male,White,Plasma
+X25,70484,33.0,Male,White,Plasma
+X26,70498,23.0,Female,White,Plasma
+X27,70510,37.0,Female,Asian,Plasma
+X28,70539,24.0,Female,Asian,Plasma
+X29,70548,31.0,Male,White,Plasma
+X30,70549,32.0,Male,African American,Plasma
+X31,70557,20.0,Male,Native Hawaiian or Other Pacific Islander,Plasma
+X32,70581,38.0,Male,Asian,Plasma
+X33,70583,20.0,Male,White,Plasma
+X34,70695,29.0,Female,Asian,Plasma
+X35,70716,22.0,Female,White,Plasma
+X36,70831,30.0,Female,White,Plasma
+X37,70956,27.0,Female,White,Plasma
+X38,70977,24.0,Female,White,Plasma
+X39,71004,21.0,Female,Native Hawaiian or Other Pacific Islander,Plasma
+X40,71039,28.0,Male,White,Plasma
+X41,71080,26.0,Female,White,Plasma
+X42,71121,21.0,Female,Asian,Plasma
+X43,71134,22.0,Female,White,Plasma
+X44,71138,25.0,Male,White,Plasma
+X45,71154,26.0,Male,Asian,Plasma
+X46,71229,34.0,Male,White,Plasma
+X48,71244,30.0,Male,White,Plasma
+X49,71263,37.0,Female,White,Plasma
+X50,71305,24.0,Female,White,Plasma
+X52,71316,23.0,Male,White,Plasma
+X53,71337,27.0,Female,White,Plasma
+X54,71346,28.0,Male,White,Plasma
+X55,71358,40.0,Female,Asian,Plasma
+X56,71367,26.0,Female,White,Plasma
+X57,71387,25.0,Female,Asian,Plasma
+X58,71398,30.0,Female,White,Plasma
+X59,71431,40.0,Male,Asian,Plasma
+X60,71438,35.0,Male,Asian,Plasma
+X61,71443,25.0,Female,White,Plasma
+X62,71467,37.0,Female,Asian,Plasma
+X63,71471,29.0,Female,White,Plasma
+X64,71473,32.0,Male,Asian,Plasma
+X65,71495,31.0,Female,Asian,Plasma
+X66,71521,40.0,Male,White,Plasma
+X67,71582,32.0,Female,Asian,Plasma
+X68,71591,34.0,Female,White,Plasma
+X69,71690,37.0,Female,Multiracial,Plasma
+X76,71856,31.0,Female,Asian,Plasma
+X77,71875,33.0,Female,White,Plasma
+X79,71911,22.0,Male,Asian,Plasma
+X80,71916,39.0,Female,African American,Plasma
+X81,71919,38.0,Female,African American,Plasma
+X82,71927,29.0,Male,Asian,Plasma
+X83,71940,23.0,Female,White,Plasma
+X84,71973,22.0,Male,White,Plasma
+X85,71983,25.0,Male,White,Plasma
+X86,72049,26.0,Female,Asian,Plasma
+X87,72062,25.0,Male,White,Plasma
+X88,72078,21.0,Female,Asian,Plasma
+X89,72108,40.0,Female,African American,Plasma
+X90,72111,33.0,Male,White,Plasma
+X91,72114,26.0,Female,White,Plasma
+X92,72119,36.0,Male,African American,Plasma
+X93,72133,35.0,Male,African American,Plasma
+X96,72148,27.0,Male,Multiracial,Plasma
+X99,72253*,22.0,Male,Asian,Plasma
+X100,72254*,22.0,Male,Asian,Plasma
+X102,72316,30.0,Male,Asian,Plasma
+X103,72339*,21.0,Male,Asian,Plasma
+X104,72349*,32.0,Male,Asian,Plasma
+X105,72376,25.0,Male,White,Plasma
+X106,72397,27.0,Male,African American,Plasma
+X13,70114,24.0,Female,Asian,Plasma
+X51,71311,23.0,Male,White,Plasma
+X72,71796,41.0,Male,White,Plasma
+X73,71816,39.0,Female,Asian,Plasma
+X74,71818,22.0,Female,Asian,Plasma
+X75,71843,28.0,Male,White,Plasma
+X78,71906,33.0,Female,White,Plasma
+X95,72138,22.0,Female,Multiracial,Plasma
+X97,72165,21.0,Male,Asian,Plasma
+X98,72221*,40.0,Male,Asian,Plasma
+X101,72255*,28.0,Male,Asian,Plasma

@@ -1,0 +1,61 @@
+,Participant.ID,Age,Gender,Race,Source
+X1,70014,23.0,Male,Asian,Plasma
+X2,70016,39.0,Male,White,Plasma
+X11,70105,40.0,Male,White,Plasma
+X14,70125,30.0,Female,White,Plasma
+X15,70182,33.0,Female,White,Plasma
+X18,70348,27.0,Female,African American,Plasma
+X21,70416,31.0,Male,White,Plasma
+X22,70435,24.0,Female,White,Plasma
+X26,70498,23.0,Female,White,Plasma
+X40,71039,28.0,Male,White,Plasma
+X46,71229,34.0,Male,White,Plasma
+X48,71244,30.0,Male,White,Plasma
+X52,71316,23.0,Male,White,Plasma
+X56,71367,26.0,Female,White,Plasma
+X59,71431,40.0,Male,Asian,Plasma
+X60,71438,35.0,Male,Asian,Plasma
+X62,71467,37.0,Female,Asian,Plasma
+X64,71473,32.0,Male,Asian,Plasma
+X66,71521,40.0,Male,White,Plasma
+X67,71582,32.0,Female,Asian,Plasma
+X68,71591,34.0,Female,White,Plasma
+X69,71690,37.0,Female,Multiracial,Plasma
+X77,71875,33.0,Female,White,Plasma
+X88,72078,21.0,Female,Asian,Plasma
+X89,72108,40.0,Female,African American,Plasma
+X90,72111,33.0,Male,White,Plasma
+X93,72133,35.0,Male,African American,Plasma
+X107,70014,23.0,Male,Asian,Serum
+X108,70016,39.0,Male,White,Serum
+X109,70105,40.0,Male,White,Serum
+X110,70125,30.0,Female,White,Serum
+X113,70416,31.0,Male,White,Serum
+X114,70435,24.0,Female,White,Serum
+X115,70498,23.0,Female,White,Serum
+X116,71039,28.0,Male,White,Serum
+X119,71229,34.0,Male,White,Serum
+X120,71244,30.0,Male,White,Serum
+X121,71316,23.0,Male,White,Serum
+X122,71367,26.0,Female,White,Serum
+X123,71431,40.0,Male,Asian,Serum
+X124,71438,35.0,Male,Asian,Serum
+X125,71467,37.0,Female,Asian,Serum
+X126,71473,32.0,Male,Asian,Serum
+X127,71521,40.0,Male,White,Serum
+X128,71582,32.0,Female,Asian,Serum
+X129,71591,34.0,Female,White,Serum
+X130,71690,37.0,Female,Multiracial,Serum
+X131,71818,22.0,Female,Asian,Serum
+X132,71875,33.0,Female,White,Serum
+X133,71906,33.0,Female,White,Serum
+X134,72078,21.0,Female,Asian,Serum
+X135,72108,40.0,Female,African American,Serum
+X136,72111,33.0,Male,White,Serum
+X137,72133,35.0,Male,African American,Serum
+X138,72165,21.0,Male,Asian,Serum
+X74,71818,22.0,Female,Asian,Plasma
+X78,71906,33.0,Female,White,Plasma
+X97,72165,21.0,Male,Asian,Plasma
+X111,70182,33.0,Female,White,Serum
+X112,70348,27.0,Female,African American,Serum

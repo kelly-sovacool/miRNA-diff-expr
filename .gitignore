@@ -1,0 +1,8 @@
+*.RData
+output*
+.DS_Store
+.Rhistory
+.ipynb_checkpoints/
+*.tsv
+Icon*
+*.tex

@@ -6,3 +6,5 @@ output*
 *.tsv
 Icon*
 *.tex
+.Rproj.user
+tutorial*

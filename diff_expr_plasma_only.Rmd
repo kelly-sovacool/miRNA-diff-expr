@@ -10,6 +10,7 @@ editor_options:
 setwd("/Users/kelly/gdrive_umich/tewari_lab/U01_exRNA_Healthy_Persons_and_Feeding/miRNA-diff-expr")
 samples <- read.csv('plasma_samples.csv')
 counts <- read.csv('plasma_mir_counts.csv')
+samples$Participant.ID <- factor(samples$Participant.ID)  # ID is categorical, not numerical
 rownames(counts) = counts$X
 rownames(samples) = samples$X
 counts$X <- NULL  # remove extra column
@@ -22,7 +23,7 @@ head(counts)
 ## Run the DESeq2 pipeline
 ```{r}
 library(DESeq2)
-deseq2Data <- DESeqDataSetFromMatrix(countData = counts, design = ~ Participant.ID, colData = samples)
+deseq2Data <- DESeqDataSetFromMatrix(countData = counts, design = ~ Participant.ID + Race + Gender + Age, colData = samples)
 deseq2Data <- DESeq(deseq2Data)
 results <- results(deseq2Data, cooksCutoff=FALSE, independentFiltering=FALSE)
 head(as.data.frame(results))
@@ -52,11 +53,22 @@ pheatmap(sampleDistMatrix,
          col=colors)
 ```
 
-## Create a PCA plot
+## Create a PCA plot showing Race x Gender
 ```{r}
 pcaData <- plotPCA(vstData, intgroup=c("Race", "Gender"), returnData=TRUE)
 percentVar <- round(100 * attr(pcaData, "percentVar"))
 ggplot(pcaData, aes(PC1, PC2, color=Race, shape=Gender)) +
+  geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) + 
+  coord_fixed()
+```
+
+## Create a PCA plot showing Age x Gender
+```{r}
+pcaData <- plotPCA(vstData, intgroup=c("Age", "Gender"), returnData=TRUE)
+percentVar <- round(100 * attr(pcaData, "percentVar"))
+ggplot(pcaData, aes(PC1, PC2, color=Age, shape=Gender)) +
   geom_point(size=3) +
   xlab(paste0("PC1: ",percentVar[1],"% variance")) +
   ylab(paste0("PC2: ",percentVar[2],"% variance")) + 

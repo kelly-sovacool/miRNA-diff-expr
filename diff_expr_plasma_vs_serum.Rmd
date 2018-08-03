@@ -10,6 +10,7 @@ editor_options:
 setwd("/Users/kelly/gdrive_umich/tewari_lab/U01_exRNA_Healthy_Persons_and_Feeding/miRNA-diff-expr")
 samples <- read.csv('matched_plasma-serum_samples.csv')
 counts <- read.csv('matched_plasma-serum_mir_counts.csv')
+samples$Participant.ID <- factor(samples$Participant.ID)  # ID is categorical, not numerical
 rownames(counts) = counts$X
 rownames(samples) = samples$X
 counts$X <- NULL  # remove extra column

@@ -1,0 +1,69 @@
+---
+title: "Differential expression analysis using DESeq2"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+## Load the sample data and miRNA counts
+```{r}
+setwd("/Users/kelly/gdrive_umich/tewari_lab/U01_exRNA_Healthy_Persons_and_Feeding/miRNA-diff-expr")
+samples <- read.csv('matched_plasma-serum_samples.csv')
+counts <- read.csv('matched_plasma-serum_mir_counts.csv')
+rownames(counts) = counts$X
+rownames(samples) = samples$X
+counts$X <- NULL  # remove extra column
+samples$X <- NULL
+counts <- counts[,unique(rownames(samples))]
+head(samples)
+head(counts)
+```
+
+## Run the DESeq2 pipeline
+```{r}
+library(DESeq2)
+deseq2Data <- DESeqDataSetFromMatrix(countData = counts, design = ~ Participant.ID + Source, colData = samples)
+deseq2Data <- DESeq(deseq2Data)
+results <- results(deseq2Data, cooksCutoff=FALSE, independentFiltering=FALSE)
+head(as.data.frame(results))
+```
+
+## Create a heatmap of the log-transformed expression data
+```{r}
+library(pheatmap)
+select <- order(rowMeans(counts(deseq2Data,normalized=TRUE)), decreasing=TRUE)
+Source <- colData(deseq2Data)[,c("Source")]
+annotations <- as.data.frame(Source)
+rownames(annotations) <- colnames(deseq2Data)
+pheatmap(assay(vstData)[select,], cluster_rows=TRUE, show_rownames=FALSE, cluster_cols=TRUE, annotation_col=annotations)
+```
+
+## Create a heatmap of sample-to-sample distances
+```{r}
+library("RColorBrewer")
+vstData <- varianceStabilizingTransformation(deseq2Data, blind=FALSE)  # transform the data
+sampleDists <- dist(t(assay(vstData)))  # compute sample-to-sample distances
+sampleDistMatrix <- as.matrix(sampleDists)
+rownames(sampleDistMatrix) <- paste(vstData$Participant.ID, vstData$Source, sep=" - ")
+colnames(sampleDistMatrix) <- NULL
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows=sampleDists,
+         clustering_distance_cols=sampleDists,
+         col=colors)
+```
+
+## Create a PCA plot
+```{r}
+pcaData <- plotPCA(vstData, intgroup=c("Source"), returnData=TRUE)
+percentVar <- round(100 * attr(pcaData, "percentVar"))
+ggplot(pcaData, aes(PC1, PC2, color=Source)) +
+  geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) + 
+  coord_fixed()
+```
+```{r}
+save.image("diff_expr_plasma_vs_serum.RData")
+```
+

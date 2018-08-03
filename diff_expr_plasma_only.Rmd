@@ -1,19 +1,68 @@
 ---
-title: "R Notebook"
+title: "Differential expression analysis using DESeq2"
 output: html_notebook
+editor_options: 
+  chunk_output_type: inline
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
-
+## Load the sample data and miRNA counts
 ```{r}
-plot(cars)
+setwd("/Users/kelly/gdrive_umich/tewari_lab/U01_exRNA_Healthy_Persons_and_Feeding/miRNA-diff-expr")
+samples <- read.csv('plasma_samples.csv')
+counts <- read.csv('plasma_mir_counts.csv')
+rownames(counts) = counts$X
+rownames(samples) = samples$X
+counts$X <- NULL  # remove extra column
+samples$X <- NULL
+counts <- counts[,unique(rownames(samples))]
+head(samples)
+head(counts)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+## Run the DESeq2 pipeline
+```{r}
+library(DESeq2)
+deseq2Data <- DESeqDataSetFromMatrix(countData = counts, design = ~ Participant.ID, colData = samples)
+deseq2Data <- DESeq(deseq2Data)
+results <- results(deseq2Data, cooksCutoff=FALSE, independentFiltering=FALSE)
+head(as.data.frame(results))
+```
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+## Create a heatmap of the transformed expression data
+```{r}
+library(pheatmap)
+select <- order(rowMeans(counts(deseq2Data,normalized=TRUE)), decreasing=TRUE)
+annotations <- as.data.frame(colData(deseq2Data)[,c("Race", 'Gender')])
+rownames(annotations) <- colnames(deseq2Data)
+pheatmap(assay(vstData)[select,], cluster_rows=TRUE, show_rownames=FALSE, cluster_cols=TRUE, annotation_col=annotations)
+```
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+## Create a heatmap of sample-to-sample distances
+```{r}
+library("RColorBrewer")
+vstData <- varianceStabilizingTransformation(deseq2Data, blind=FALSE)  # transform the data
+sampleDists <- dist(t(assay(vstData)))  # compute sample-to-sample distances
+sampleDistMatrix <- as.matrix(sampleDists)
+rownames(sampleDistMatrix) <- paste(vstData$Race, vstData$Gender, sep=" - ")
+colnames(sampleDistMatrix) <- NULL
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows=sampleDists,
+         clustering_distance_cols=sampleDists,
+         col=colors)
+```
+
+## Create a PCA plot
+```{r}
+pcaData <- plotPCA(vstData, intgroup=c("Race", "Gender"), returnData=TRUE)
+percentVar <- round(100 * attr(pcaData, "percentVar"))
+ggplot(pcaData, aes(PC1, PC2, color=Race, shape=Gender)) +
+  geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) + 
+  coord_fixed()
+```
+```{r}
+save.image("diff_expr_plasma_only.RData")
+```
 

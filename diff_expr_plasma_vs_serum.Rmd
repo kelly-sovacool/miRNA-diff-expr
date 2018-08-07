@@ -1,23 +1,59 @@
 ---
-title: "Differential expression analysis using DESeq2"
+title: "Differential expression analysis using DESeq2 for matched plasma & serum samples"
 output: html_notebook
 editor_options: 
   chunk_output_type: inline
 ---
-
+## Get matched plasma & serum samples
+```{python3}
+import pandas as pd
+samples = pd.read_csv('data/sample_sheet.csv')
+# must be Healthy Control Study and must pass MiSeq QC
+samples = samples.loc[(samples['Study'] == 'Healthy Controls') & (samples['MISEQ.QC.PASS'] == 'PASS')]  
+samples = samples.set_index('MT.Unique.ID').sort_values(by=['Participant.ID', 'Source'])
+# capitalize & strip whitespace for consistency
+for column in ['Gender', 'Race', 'Source']:
+    samples[column] = samples[column].str.capitalize()
+    samples[column] = samples[column].str.strip()
+# use correct ontology terms
+race_ontology = {'Asian': 'Asian',
+ 'Black or african american': 'African American',
+ 'Mixed/asian & white': 'Multiracial',
+ 'Mixed/asian &black': 'Multiracial',
+ 'Mixed/black, white, asian': 'Multiracial',
+ 'Native hawiian or other pacific islander': 'Pacific Islander',
+ 'Pacific islander': 'Pacific Islander',
+ 'White': 'White'}
+for id in samples.index:
+    race = samples.at[id, 'Race']
+    samples.at[id, 'Race'] = race_ontology[race] if race in race_ontology else 'Multiracial'
+# get matched plasma & serum samples
+mir_counts = pd.read_csv("data/get_canonical/canon_mir_counts.csv", index_col=0)
+samples.index = pd.Index(['X' + str(row) for row in samples.index])
+serum_part_ids = set(samples.loc[samples['Source'] =='Serum']['Participant.ID'])
+matched_samples = samples.loc[samples['Participant.ID'].isin(serum_part_ids)]
+matched_mir_counts = mir_counts[matched_samples.index]
+matched_samples.to_csv('data/matched_plasma-serum_samples.csv')
+matched_mir_counts.to_csv('data/matched_plasma-serum_mir_counts.csv')
+```
 ## Load the sample data and miRNA counts
 ```{r}
-setwd("/Users/kelly/gdrive_umich/tewari_lab/U01_exRNA_Healthy_Persons_and_Feeding/miRNA-diff-expr")
-samples <- read.csv('matched_plasma-serum_samples.csv')
-counts <- read.csv('matched_plasma-serum_mir_counts.csv')
+samples <- read.csv('data/matched_plasma-serum_samples.csv')
+counts <- read.csv('data/matched_plasma-serum_mir_counts.csv')
 samples$Participant.ID <- factor(samples$Participant.ID)  # ID is categorical, not numerical
+samples$Sample.ID <- factor(samples$Sample.ID)
 rownames(counts) = counts$X
 rownames(samples) = samples$X
 counts$X <- NULL  # remove extra column
 samples$X <- NULL
-counts <- counts[,unique(rownames(samples))]
+counts <- counts[,rownames(samples)]
 head(samples)
 head(counts)
+```
+
+## Filter
+```{r}
+
 ```
 
 ## Run the DESeq2 pipeline

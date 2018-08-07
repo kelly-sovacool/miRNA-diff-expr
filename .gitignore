@@ -8,4 +8,4 @@ Icon*
 *.tex
 .Rproj.user
 tutorial*
-from_quickmirseq/
+data/from_quickmirseq

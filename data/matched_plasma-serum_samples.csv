@@ -9,8 +9,8 @@ X14,70125,70125,Healthy Controls,30.0,Female,White,7/11/2002,Plasma,Set 1b,Index
 X110,70125,70125,Healthy Controls,30.0,Female,White,7/11/2002,Serum,Set 5,Index16,Run3,PASS
 X15,70182,70182,Healthy Controls,33.0,Female,White,5/20/2002,Plasma,Set 1b,Index15,Run1,PASS
 X111,70182,70182,Healthy Controls,33.0,Female,White,5/20/2002,Serum,SetRecheck,Index17,Run20,PASS
-X18,70348,70348,Healthy Controls,27.0,Female,African American,7/15/2002,Plasma,Set 1b,Index18,Run1,PASS
-X112,70348,70348,Healthy Controls,27.0,Female,African American,7/15/2002,Serum,SetRecheck,Index18,Run21,PASS
+X18,70348,70348,Healthy Controls,27.0,Female,African_American,7/15/2002,Plasma,Set 1b,Index18,Run1,PASS
+X112,70348,70348,Healthy Controls,27.0,Female,African_American,7/15/2002,Serum,SetRecheck,Index18,Run21,PASS
 X21,70416,70416,Healthy Controls,31.0,Male,White,7/15/2002,Plasma,Set 1b,Index21,Run1,PASS
 X113,70416,70416,Healthy Controls,31.0,Male,White,7/15/2002,Serum,Set 5,Index19,Run3,PASS
 X22,70435,70435,Healthy Controls,24.0,Female,White,7/15/2002,Plasma,Set 1b,Index22,Run1,PASS
@@ -51,11 +51,11 @@ X78,71906,71906,Healthy Controls,33.0,Female,White,6/29/2004,Plasma,SetRecheck,I
 X133,71906,71906,Healthy Controls,33.0,Female,White,6/29/2004,Serum,Set 6,Index39,Run3,PASS
 X88,72078,72078,Healthy Controls,21.0,Female,Asian,4/5/2005,Plasma,Set 4,Index42,Run2,PASS
 X134,72078,72078,Healthy Controls,21.0,Female,Asian,4/5/2005,Serum,Set 6,Index40,Run3,PASS
-X89,72108,72108,Healthy Controls,40.0,Female,African American,5/17/2005,Plasma,Set 4,Index43,Run2,PASS
-X135,72108,72108,Healthy Controls,40.0,Female,African American,5/17/2005,Serum,Set 6,Index42,Run3,PASS
+X89,72108,72108,Healthy Controls,40.0,Female,African_American,5/17/2005,Plasma,Set 4,Index43,Run2,PASS
+X135,72108,72108,Healthy Controls,40.0,Female,African_American,5/17/2005,Serum,Set 6,Index42,Run3,PASS
 X90,72111,72111,Healthy Controls,33.0,Male,White,6/2/2005,Plasma,Set 4,Index44,Run2,PASS
 X136,72111,72111,Healthy Controls,33.0,Male,White,6/2/2005,Serum,Set 6,Index43,Run3,PASS
-X93,72133,72133,Healthy Controls,35.0,Male,African American,7/8/2005,Plasma,Set 4,Index47,Run2,PASS
-X137,72133,72133,Healthy Controls,35.0,Male,African American,7/8/2005,Serum,Set 6,Index44,Run3,PASS
+X93,72133,72133,Healthy Controls,35.0,Male,African_American,7/8/2005,Plasma,Set 4,Index47,Run2,PASS
+X137,72133,72133,Healthy Controls,35.0,Male,African_American,7/8/2005,Serum,Set 6,Index44,Run3,PASS
 X97,72165,72165,Healthy Controls,21.0,Male,Asian,8/29/2005,Plasma,SetRecheck,Index3,Run17,PASS
 X138,72165,72165,Healthy Controls,21.0,Male,Asian,8/29/2005,Serum,Set 6,Index45,Run3,PASS

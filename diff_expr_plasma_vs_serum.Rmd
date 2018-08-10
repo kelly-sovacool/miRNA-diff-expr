@@ -119,7 +119,7 @@ res <- residuals(fit, type="deviance")
 set <- newSeqExpressionSet(dge$counts, phenoData=dge$samples)
 for(k in 1:10) {
   ruvr_set <- RUVr(set, row.names(dge), k=k, res)
-  assay(reads_sce, paste("RUVr", toString(k))) <- log2(t(t(assayData(ruvr_set)$normalizedCounts) / colSums(assayData(ruvr_set)$normalizedCounts) * 1e6) + 1)
+  assay(reads_sce, paste("RUVr k=", toString(k))) <- log2(t(t(assayData(ruvr_set)$normalizedCounts) / colSums(assayData(ruvr_set)$normalizedCounts) * 1e6) + 1)
 }
 for(n in assayNames(reads_sce)) {
   print(
@@ -143,9 +143,39 @@ head(outliers)
 ```{r}
 for (var in c("total_features", "Age", "Library.Generation.Set", "Index", "Participant.ID", "Source", "Race", "Gender", "Collection.Date")) {
   print(
-    plotQC(reads_sce, type = "find-pcs", exprs_values = "RUVr1", variable = var)
+    plotQC(reads_sce, type = "find-pcs", exprs_values = "RUVr k= 2", variable = var)
     )  + ggtitle(var) 
 }
+```
+## Visualize top plasma-vs-serum miRNAs
+```{r}
+library(RColorBrewer)
+library(reshape2)
+# Ryan's code, modified
+norm.expr.matr <- exprs(reads_sce)
+# Rank the mean expression values for plasma/serum miRs. Highest expression = 1
+mean.expr.plasma.rank <- rank(-1*rowMeans(norm.expr.matr[, colData(reads_sce)$Source=="Plasma"]))
+mean.expr.serum.rank <- rank(-1*rowMeans(norm.expr.matr[, colData(reads_sce)$Source=="Serum"]))
+top_N <- 18  # top_N=18 resuls in 20 miRNAs in the plot
+top.miRs <- row.names(norm.expr.matr)[mean.expr.plasma.rank <= top_N | mean.expr.serum.rank <= top_N] # get the names of the top miRs in plasma or serum
+norm.expr.top <- norm.expr.matr[top.miRs, ] # Get the expression matrix for the top mIRs
+norm.expr.melt <- reshape2::melt(norm.expr.top) # Convert your normalized expression matrix to a 3 column data.frame (row.name, col.name, expression value). Melt is in the dpylr package, I believe.
+colnames(norm.expr.melt) <- c("miR.ID", "MT.Unique.ID", "norm.expr") # just so it's easier for me to tell you which columns I'm using.
+norm.expr.melt$Source <- ""
+for (row_num in 1:nrow(norm.expr.melt)){  # Pull the plasma/serum source value from the column metadata.
+  mt_unique_id <- norm.expr.melt[row_num, ]$MT.Unique.ID
+  norm.expr.melt[row_num, "Source"] <- as.character(samples[mt_unique_id,"Source"])
+}
+# This would be a simple boxplot with plasma/serum side-by-side. Overlaying the boxes over points takes a little more tweaking to get the dodge/width right, but it's doable.
+ggplot(norm.expr.melt, aes(x=reorder(miR.ID, norm.expr, FUN=median), y=norm.expr, fill=Source)) + geom_boxplot(pos="dodge", outlier.size=0.5) + 
+  ggtitle("Top 20 Expressed miRNAs") + ylab("Normalized Expression") + xlab("miRNA ID") + 
+  theme(panel.grid.major.x = element_line(size = 0.5, linetype = 'solid', colour = "grey"), 
+        panel.grid.major.y = element_blank(),
+        axis.text.x = element_text(angle = 90, hjust = 1))
+ggplot(norm.expr.melt, aes(x=reorder(miR.ID, norm.expr, FUN=median), y=norm.expr, fill=Source)) + geom_boxplot(pos="dodge", outlier.size=0.5) + 
+  ggtitle("Top 20 Expressed miRNAs") + ylab("Normalized Expression") + xlab("miRNA ID") + 
+  theme(panel.grid.major.y = element_line(size = 0.5, linetype = 'solid', colour = "grey"), 
+        panel.grid.major.x = element_blank()) + coord_flip()
 ```
 
 # Visualize EdgeR results
@@ -177,7 +207,6 @@ pheatmap(assay(vstData)[select,], cluster_rows=TRUE, show_rownames=FALSE, cluste
 
 ## Create a heatmap of sample-to-sample distances
 ```{r}
-library("RColorBrewer")
 sampleDists <- dist(t(assay(vstData)))  # compute sample-to-sample distances
 sampleDistMatrix <- as.matrix(sampleDists)
 rownames(sampleDistMatrix) <- paste(vstData$Participant.ID, vstData$Source, sep=" - ")

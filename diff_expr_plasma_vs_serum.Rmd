@@ -39,6 +39,10 @@ matched_mir_counts.to_csv('data/matched_plasma-serum_mir_counts.csv')
 ## Load the sample data and miRNA counts
 ```{r}
 samples <- read.csv('data/matched_plasma-serum_samples.csv')
+samples <- subset(samples, Library.Generation.Set != "SetRecheck" )  # exclude SetRecheck samples
+# sample X11 is outlier -- remove it and its match
+outlier_id <- samples[samples$X=="X11",]$Participant.ID
+samples <- samples[samples$Participant.ID != outlier_id,]
 counts <- read.csv('data/matched_plasma-serum_mir_counts.csv')
 samples$Participant.ID <- factor(samples$Participant.ID)  # ID is categorical, not numerical
 samples$Sample.ID <- factor(samples$Sample.ID)
@@ -48,26 +52,36 @@ counts$X <- NULL  # remove extra column
 counts <- counts[,rownames(samples)]
 head(samples)
 head(counts)
-plasma_samples <- subset(samples, Source == "Plasma")
-plasma_counts <- counts[rownames(plasma_samples)]
-serum_samples <- subset(samples, Source == "Serum")
-serum_counts <- counts[rownames(serum_samples)]
 ```
-
-# Explore variance & Filter
+## Filter
+```{r}
+library(edgeR)
+design <- model.matrix(~0+Source+Race+Gender+Age, samples)
+dge = DGEList(counts = counts, samples = samples)
+# require miRNAs to have CPM > 1 in at least 2 samples
+countsPerMillion <- edgeR::cpm(dge)
+countCheck <- countsPerMillion > 1
+head(countCheck)
+keep <- which(rowSums(countCheck) >= 2) 
+dge <- dge[keep,]
+```
+## Explore variance
 ```{r}
 library(SingleCellExperiment)
 library(scater)
-reads_sce <- SingleCellExperiment(assays=list(counts=as.matrix(counts)),  colData=samples)
-plasma_sce <- SingleCellExperiment(assays=list(counts=as.matrix(plasma_counts)), colData=plasma_samples)
-serum_sce <- SingleCellExperiment(assays=list(counts=as.matrix(serum_counts)), colData=serum_samples)
+reads_sce <- SingleCellExperiment(assays=list(counts=dge$counts),  colData=dge$samples)
 # remove unexpressed miRNAs
 keep_feature <- rowSums(counts(reads_sce) > 0) > 0
 reads_sce <- reads_sce[keep_feature, ]
 reads_sce <- calculateQCMetrics(reads_sce)
-plasma_sce <- plasma_sce[rowSums(counts(plasma_sce)>0)>0,]
+# create separate plasma & serum SCEs
+plasma_samples <- subset(colData(reads_sce), Source == "Plasma")
+plasma_counts <- as.data.frame(counts(reads_sce))[rownames(plasma_samples)]
+plasma_sce <- SingleCellExperiment(assays=list(counts=as.matrix(plasma_counts)), colData=plasma_samples)
 plasma_sce <- calculateQCMetrics(plasma_sce)
-serum_sce <- serum_sce[rowSums(counts(plasma_sce)>0)>0,]
+serum_samples <- subset(colData(reads_sce), Source == "Serum")
+serum_counts <- as.data.frame(counts(reads_sce))[rownames(serum_samples)]
+serum_sce <- SingleCellExperiment(assays=list(counts=as.matrix(serum_counts)), colData=serum_samples)
 serum_sce <- calculateQCMetrics(serum_sce)
 # log transform
 cpm(reads_sce) <- calculateCPM(reads_sce)
@@ -76,12 +90,12 @@ logcounts(reads_sce) <- log2(calculateCPM(reads_sce) + 1)
 # visualize
 hist(reads_sce$total_counts, breaks=100)  # counts per sample
 hist(reads_sce$total_features, breaks=100)  # counts per miRNA
-plotQC(reads_sce, type = "highest-expression")
+plotQC(reads_sce, type = "highest-expression") + ggtitle("Plasma & Serum")
 plotQC(plasma_sce, type = "highest-expression") + ggtitle("Plasma")
 plotQC(serum_sce, type = "highest-expression") + ggtitle("Serum")
-plotQC(reads_sce, type="explanatory-variables", variables=c("Index", "Participant.ID", "Collection.Date", "Library.Generation.Set", "MiSeq.QC.Run", "Source", 'total_features'))
+plotQC(reads_sce, type="explanatory-variables", variables=c("Index", "Participant.ID", "Collection.Date", "Library.Generation.Set", "MiSeq.QC.Run", "Source", 'total_features', "Age", "Race", "Sex"))
 ```
-## Examine sources of variance
+## Examine sources of variation
 ```{r}
 plotPCA(reads_sce, exprs_values = "logcounts", colour_by = "Library.Generation.Set", size_by = "total_features", shape_by = "Source")
 for (var in c("total_features", "Age", "Library.Generation.Set", "Index", "Participant.ID", "Source", "Race", "Gender", "Collection.Date")) {
@@ -91,21 +105,22 @@ for (var in c("total_features", "Age", "Library.Generation.Set", "Index", "Parti
   }
 ```
 
-## Remove unwanted sources of variation
+## Normalize & Remove unwanted sources of variation
 ```{r}
 library(RUVSeq)
-library(edgeR)
 library(ggplot2)
-design <- model.matrix(~0+Source+Race+Gender+Age, samples)
-dge = DGEList(counts = counts(reads_sce), samples = colData(reads_sce))
+library(mvoutlier)
 dge <- calcNormFactors(dge)
 dge <- estimateGLMCommonDisp(dge, design)
 dge <- estimateGLMTagwiseDisp(dge, design)
 fit <- glmFit(dge, design)
+lrt <- glmLRT(fit, coef=2)
 res <- residuals(fit, type="deviance")
 set <- newSeqExpressionSet(dge$counts, phenoData=dge$samples)
-ruvr1 <- RUVr(set, row.names(dge), k=1, res)
-assay(reads_sce, "RUVr1") <- log2(t(t(assayData(ruvr1)$normalizedCounts) / colSums(assayData(ruvr1)$normalizedCounts) * 1e6) + 1)
+for(k in 1:10) {
+  ruvr_set <- RUVr(set, row.names(dge), k=k, res)
+  assay(reads_sce, paste("RUVr", toString(k))) <- log2(t(t(assayData(ruvr_set)$normalizedCounts) / colSums(assayData(ruvr_set)$normalizedCounts) * 1e6) + 1)
+}
 for(n in assayNames(reads_sce)) {
   print(
         plotPCA(
@@ -118,6 +133,12 @@ for(n in assayNames(reads_sce)) {
   )
 }
 ```
+## Detect outliers
+```{r}
+reads_sce <- runPCA(reads_sce, use_coldata = TRUE, detect_outliers = TRUE)
+outliers <- colnames(reads_sce)[reads_sce$outlier]
+head(outliers)
+```
 ## Examine sources of variance after removing unwanted variation
 ```{r}
 for (var in c("total_features", "Age", "Library.Generation.Set", "Index", "Participant.ID", "Source", "Race", "Gender", "Collection.Date")) {
@@ -127,7 +148,14 @@ for (var in c("total_features", "Age", "Library.Generation.Set", "Index", "Parti
 }
 ```
 
-# Run the DESeq2 pipeline
+# Visualize EdgeR results
+```{r}
+topTags(lrt)
+# TODO: filter by p-value and/or FDR
+# TODO: heatmap
+```
+
+# Run the DESeq2 pipeline & Visualize results
 ```{r}
 library(DESeq2)  # TODO: use filtered & RUVSeq-corrected data
 deseq2Data <- DESeqDataSetFromMatrix(countData = counts, design = ~ Participant.ID + Source, colData = samples)
@@ -136,10 +164,9 @@ results <- results(deseq2Data, cooksCutoff=FALSE, independentFiltering=FALSE)
 head(as.data.frame(results))
 ```
 
-# Visualize
 ## Create a heatmap of the variance-stabilizing-transformed expression data
 ```{r}
-library(pheatmap)
+library(pheatmap)   # TODO: only use top DE miRNAs
 vstData <- varianceStabilizingTransformation(deseq2Data, blind=FALSE)  # transform the data
 select <- order(rowMeans(counts(deseq2Data,normalized=TRUE)), decreasing=TRUE)
 Source <- colData(deseq2Data)[,c("Source")]

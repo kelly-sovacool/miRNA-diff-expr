@@ -1,5 +1,5 @@
 ---
-title: "Differential expression analysis using DESeq2 for matched plasma & serum samples"
+title: "miRNA Differential expression analysis for matched plasma & serum samples"
 output: html_notebook
 editor_options: 
   chunk_output_type: console

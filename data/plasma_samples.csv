@@ -1,101 +1,101 @@
-,Participant.ID,Age,Gender,Race,Source
-X1,70014,23.0,Male,Asian,Plasma
-X2,70016,39.0,Male,White,Plasma
-X3,70028,33.0,Female,White,Plasma
-X4,70029,27.0,Female,African American,Plasma
-X5,70038,22.0,Female,White,Plasma
-X6,70057,31.0,Male,Asian,Plasma
-X7,70067,29.0,Male,White,Plasma
-X8,70082,24.0,Male,White,Plasma
-X9,70092,25.0,Male,Asian,Plasma
-X10,70103,22.0,Male,Asian,Plasma
-X11,70105,40.0,Male,White,Plasma
-X14,70125,30.0,Female,White,Plasma
-X15,70182,33.0,Female,White,Plasma
-X16,70283,21.0,Female,Asian,Plasma
-X17,70287,26.0,Female,Asian,Plasma
-X18,70348,27.0,Female,African American,Plasma
-X19,70362,33.0,Female,Asian,Plasma
-X20,70406,29.0,Male,White,Plasma
-X21,70416,31.0,Male,White,Plasma
-X22,70435,24.0,Female,White,Plasma
-X23,70467,35.0,Male,White,Plasma
-X25,70484,33.0,Male,White,Plasma
-X26,70498,23.0,Female,White,Plasma
-X27,70510,37.0,Female,Asian,Plasma
-X28,70539,24.0,Female,Asian,Plasma
-X29,70548,31.0,Male,White,Plasma
-X30,70549,32.0,Male,African American,Plasma
-X31,70557,20.0,Male,Native Hawaiian or Other Pacific Islander,Plasma
-X32,70581,38.0,Male,Asian,Plasma
-X33,70583,20.0,Male,White,Plasma
-X34,70695,29.0,Female,Asian,Plasma
-X35,70716,22.0,Female,White,Plasma
-X36,70831,30.0,Female,White,Plasma
-X37,70956,27.0,Female,White,Plasma
-X38,70977,24.0,Female,White,Plasma
-X39,71004,21.0,Female,Native Hawaiian or Other Pacific Islander,Plasma
-X40,71039,28.0,Male,White,Plasma
-X41,71080,26.0,Female,White,Plasma
-X42,71121,21.0,Female,Asian,Plasma
-X43,71134,22.0,Female,White,Plasma
-X44,71138,25.0,Male,White,Plasma
-X45,71154,26.0,Male,Asian,Plasma
-X46,71229,34.0,Male,White,Plasma
-X48,71244,30.0,Male,White,Plasma
-X49,71263,37.0,Female,White,Plasma
-X50,71305,24.0,Female,White,Plasma
-X52,71316,23.0,Male,White,Plasma
-X53,71337,27.0,Female,White,Plasma
-X54,71346,28.0,Male,White,Plasma
-X55,71358,40.0,Female,Asian,Plasma
-X56,71367,26.0,Female,White,Plasma
-X57,71387,25.0,Female,Asian,Plasma
-X58,71398,30.0,Female,White,Plasma
-X59,71431,40.0,Male,Asian,Plasma
-X60,71438,35.0,Male,Asian,Plasma
-X61,71443,25.0,Female,White,Plasma
-X62,71467,37.0,Female,Asian,Plasma
-X63,71471,29.0,Female,White,Plasma
-X64,71473,32.0,Male,Asian,Plasma
-X65,71495,31.0,Female,Asian,Plasma
-X66,71521,40.0,Male,White,Plasma
-X67,71582,32.0,Female,Asian,Plasma
-X68,71591,34.0,Female,White,Plasma
-X69,71690,37.0,Female,Multiracial,Plasma
-X76,71856,31.0,Female,Asian,Plasma
-X77,71875,33.0,Female,White,Plasma
-X79,71911,22.0,Male,Asian,Plasma
-X80,71916,39.0,Female,African American,Plasma
-X81,71919,38.0,Female,African American,Plasma
-X82,71927,29.0,Male,Asian,Plasma
-X83,71940,23.0,Female,White,Plasma
-X84,71973,22.0,Male,White,Plasma
-X85,71983,25.0,Male,White,Plasma
-X86,72049,26.0,Female,Asian,Plasma
-X87,72062,25.0,Male,White,Plasma
-X88,72078,21.0,Female,Asian,Plasma
-X89,72108,40.0,Female,African American,Plasma
-X90,72111,33.0,Male,White,Plasma
-X91,72114,26.0,Female,White,Plasma
-X92,72119,36.0,Male,African American,Plasma
-X93,72133,35.0,Male,African American,Plasma
-X96,72148,27.0,Male,Multiracial,Plasma
-X99,72253*,22.0,Male,Asian,Plasma
-X100,72254*,22.0,Male,Asian,Plasma
-X102,72316,30.0,Male,Asian,Plasma
-X103,72339*,21.0,Male,Asian,Plasma
-X104,72349*,32.0,Male,Asian,Plasma
-X105,72376,25.0,Male,White,Plasma
-X106,72397,27.0,Male,African American,Plasma
-X13,70114,24.0,Female,Asian,Plasma
-X51,71311,23.0,Male,White,Plasma
-X72,71796,41.0,Male,White,Plasma
-X73,71816,39.0,Female,Asian,Plasma
-X74,71818,22.0,Female,Asian,Plasma
-X75,71843,28.0,Male,White,Plasma
-X78,71906,33.0,Female,White,Plasma
-X95,72138,22.0,Female,Multiracial,Plasma
-X97,72165,21.0,Male,Asian,Plasma
-X98,72221*,40.0,Male,Asian,Plasma
-X101,72255*,28.0,Male,Asian,Plasma
+,Sample.ID,Participant.ID,Study,Age,Gender,Race,Collection.Date,Source,Library.Generation.Set,Index,MiSeq.QC.Run,MISEQ.QC.PASS
+X1,70014,70014,Healthy Controls,23.0,Male,Asian,5/9/2002,Plasma,Set 1a,Index1,Run1,PASS
+X2,70016,70016,Healthy Controls,39.0,Male,White,5/3/2002,Plasma,Set 1a,Index2,Run1,PASS
+X3,70028,70028,Healthy Controls,33.0,Female,White,5/8/2002,Plasma,Set 1a,Index3,Run1,PASS
+X4,70029,70029,Healthy Controls,27.0,Female,African_American,5/14/2002,Plasma,Set 1a,Index4,Run1,PASS
+X5,70038,70038,Healthy Controls,22.0,Female,White,6/6/2002,Plasma,Set 1a,Index5,Run1,PASS
+X6,70057,70057,Healthy Controls,31.0,Male,Asian,5/21/2002,Plasma,Set 1a,Index6,Run1,PASS
+X7,70067,70067,Healthy Controls,29.0,Male,White,5/20/2002,Plasma,Set 1a,Index7,Run1,PASS
+X8,70082,70082,Healthy Controls,24.0,Male,White,5/28/2002,Plasma,Set 1a,Index8,Run1,PASS
+X9,70092,70092,Healthy Controls,25.0,Male,Asian,6/10/2002,Plasma,Set 1a,Index9,Run1,PASS
+X10,70103,70103,Healthy Controls,22.0,Male,Asian,6/20/2002,Plasma,Set 1a,Index10,Run1,PASS
+X11,70105,70105,Healthy Controls,40.0,Male,White,5/22/2002,Plasma,Set 1a,Index11,Run1,PASS
+X13,70114,70114,Healthy Controls,24.0,Female,Asian,5/21/2002,Plasma,SetRecheck,Index13,Run9,PASS
+X14,70125,70125,Healthy Controls,30.0,Female,White,7/11/2002,Plasma,Set 1b,Index14,Run1,PASS
+X15,70182,70182,Healthy Controls,33.0,Female,White,5/20/2002,Plasma,Set 1b,Index15,Run1,PASS
+X16,70283,70283,Healthy Controls,21.0,Female,Asian,6/21/2002,Plasma,Set 1b,Index16,Run1,PASS
+X17,70287,70287,Healthy Controls,26.0,Female,Asian,5/28/2002,Plasma,Set 1b,Index17,Run1,PASS
+X18,70348,70348,Healthy Controls,27.0,Female,African_American,7/15/2002,Plasma,Set 1b,Index18,Run1,PASS
+X19,70362,70362,Healthy Controls,33.0,Female,Asian,7/1/2002,Plasma,Set 1b,Index19,Run1,PASS
+X20,70406,70406,Healthy Controls,29.0,Male,White,7/16/2002,Plasma,Set 1b,Index20,Run1,PASS
+X21,70416,70416,Healthy Controls,31.0,Male,White,7/15/2002,Plasma,Set 1b,Index21,Run1,PASS
+X22,70435,70435,Healthy Controls,24.0,Female,White,7/15/2002,Plasma,Set 1b,Index22,Run1,PASS
+X23,70467,70467,Healthy Controls,35.0,Male,White,8/19/2002,Plasma,Set 1b,Index23,Run1,PASS
+X25,70484,70484,Healthy Controls,33.0,Male,White,8/13/2002,Plasma,Set 2,Index25,Run1,PASS
+X26,70498,70498,Healthy Controls,23.0,Female,White,9/5/2002,Plasma,Set 2,Index26,Run1,PASS
+X27,70510,70510,Healthy Controls,37.0,Female,Asian,8/19/2002,Plasma,Set 2,Index27,Run1,PASS
+X28,70539,70539,Healthy Controls,24.0,Female,Asian,9/13/2002,Plasma,Set 2,Index28,Run1,PASS
+X29,70548,70548,Healthy Controls,31.0,Male,White,9/24/2002,Plasma,Set 2,Index29,Run1,PASS
+X30,70549,70549,Healthy Controls,32.0,Male,African_American,10/15/2002,Plasma,Set 2,Index30,Run1,PASS
+X31,70557,70557,Healthy Controls,20.0,Male,Pacific_Islander,10/4/2002,Plasma,Set 2,Index31,Run1,PASS
+X32,70581,70581,Healthy Controls,38.0,Male,Asian,10/22/2002,Plasma,Set 2,Index32,Run1,PASS
+X33,70583,70583,Healthy Controls,20.0,Male,White,10/25/2002,Plasma,Set 2,Index33,Run1,PASS
+X34,70695,70695,Healthy Controls,29.0,Female,Asian,11/25/2002,Plasma,Set 2,Index34,Run1,PASS
+X35,70716,70716,Healthy Controls,22.0,Female,White,12/10/2002,Plasma,Set 2,Index35,Run1,PASS
+X36,70831,70831,Healthy Controls,30.0,Female,White,1/24/2003,Plasma,Set 2,Index36,Run1,PASS
+X37,70956,70956,Healthy Controls,27.0,Female,White,2/25/2003,Plasma,Set 2,Index37,Run1,PASS
+X38,70977,70977,Healthy Controls,24.0,Female,White,3/14/2003,Plasma,Set 2,Index38,Run1,PASS
+X39,71004,71004,Healthy Controls,21.0,Female,Pacific_Islander,4/9/2003,Plasma,Set 2,Index39,Run1,PASS
+X40,71039,71039,Healthy Controls,28.0,Male,White,3/3/2003,Plasma,Set 2,Index40,Run1,PASS
+X41,71080,71080,Healthy Controls,26.0,Female,White,2/25/2003,Plasma,Set 2,Index42,Run1,PASS
+X42,71121,71121,Healthy Controls,21.0,Female,Asian,4/9/2003,Plasma,Set 2,Index43,Run1,PASS
+X43,71134,71134,Healthy Controls,22.0,Female,White,4/8/2003,Plasma,Set 2,Index44,Run1,PASS
+X44,71138,71138,Healthy Controls,25.0,Male,White,4/11/2003,Plasma,Set 2,Index45,Run1,PASS
+X45,71154,71154,Healthy Controls,26.0,Male,Asian,4/10/2003,Plasma,Set 2,Index46,Run1,PASS
+X46,71229,71229,Healthy Controls,34.0,Male,White,4/7/2003,Plasma,Set 2,Index47,Run1,PASS
+X48,71244,71244,Healthy Controls,30.0,Male,White,4/9/2003,Plasma,Set 3,Index1,Run2,PASS
+X49,71263,71263,Healthy Controls,37.0,Female,White,5/5/2003,Plasma,Set 3,Index2,Run2,PASS
+X50,71305,71305,Healthy Controls,24.0,Female,White,6/25/2003,Plasma,Set 3,Index3,Run2,PASS
+X51,71311,71311,Healthy Controls,23.0,Male,White,6/13/2003,Plasma,SetRecheck,Index4,Run10,PASS
+X52,71316,71316,Healthy Controls,23.0,Male,White,6/2/2003,Plasma,Set 3,Index5,Run2,PASS
+X53,71337,71337,Healthy Controls,27.0,Female,White,6/16/2003,Plasma,Set 3,Index6,Run2,PASS
+X54,71346,71346,Healthy Controls,28.0,Male,White,8/12/2003,Plasma,Set 3,Index7,Run2,PASS
+X55,71358,71358,Healthy Controls,40.0,Female,Asian,7/31/2003,Plasma,Set 3,Index8,Run2,PASS
+X56,71367,71367,Healthy Controls,26.0,Female,White,6/23/2003,Plasma,Set 3,Index9,Run2,PASS
+X57,71387,71387,Healthy Controls,25.0,Female,Asian,6/30/2003,Plasma,Set 3,Index10,Run2,PASS
+X58,71398,71398,Healthy Controls,30.0,Female,White,7/29/2003,Plasma,Set 3,Index11,Run2,PASS
+X59,71431,71431,Healthy Controls,40.0,Male,Asian,8/15/2003,Plasma,Set 3,Index12,Run2,PASS
+X60,71438,71438,Healthy Controls,35.0,Male,Asian,8/15/2003,Plasma,Set 3,Index13,Run2,PASS
+X61,71443,71443,Healthy Controls,25.0,Female,White,8/21/2003,Plasma,Set 3,Index14,Run2,PASS
+X62,71467,71467,Healthy Controls,37.0,Female,Asian,10/10/2003,Plasma,Set 3,Index15,Run2,PASS
+X63,71471,71471,Healthy Controls,29.0,Female,White,10/20/2003,Plasma,Set 3,Index16,Run2,PASS
+X64,71473,71473,Healthy Controls,32.0,Male,Asian,10/27/2003,Plasma,Set 3,Index17,Run2,PASS
+X65,71495,71495,Healthy Controls,31.0,Female,Asian,10/14/2003,Plasma,Set 3,Index18,Run2,PASS
+X66,71521,71521,Healthy Controls,40.0,Male,White,10/20/2003,Plasma,Set 3,Index19,Run2,PASS
+X67,71582,71582,Healthy Controls,32.0,Female,Asian,12/16/2003,Plasma,Set 3,Index20,Run2,PASS
+X68,71591,71591,Healthy Controls,34.0,Female,White,12/16/2003,Plasma,Set 3,Index21,Run2,PASS
+X69,71690,71690,Healthy Controls,37.0,Female,Multiracial,1/21/2004,Plasma,Set 3,Index22,Run2,PASS
+X72,71796,71796,Healthy Controls,41.0,Male,White,3/9/2004,Plasma,SetRecheck,Index25,Run11,PASS
+X73,71816,71816,Healthy Controls,39.0,Female,Asian,3/23/2004,Plasma,SetRecheck,Index26,Run12,PASS
+X74,71818,71818,Healthy Controls,22.0,Female,Asian,3/1/2004,Plasma,SetRecheck,Index27,Run13,PASS
+X75,71843,71843,Healthy Controls,28.0,Male,White,3/16/2004,Plasma,SetRecheck,Index28,Run14,PASS
+X76,71856,71856,Healthy Controls,31.0,Female,Asian,4/29/2004,Plasma,Set 4,Index29,Run2,PASS
+X77,71875,71875,Healthy Controls,33.0,Female,White,6/22/2004,Plasma,Set 4,Index30,Run2,PASS
+X78,71906,71906,Healthy Controls,33.0,Female,White,6/29/2004,Plasma,SetRecheck,Index31,Run15,PASS
+X79,71911,71911,Healthy Controls,22.0,Male,Asian,8/30/2004,Plasma,Set 4,Index32,Run2,PASS
+X80,71916,71916,Healthy Controls,39.0,Female,African_American,7/9/2004,Plasma,Set 4,Index33,Run2,PASS
+X81,71919,71919,Healthy Controls,38.0,Female,African_American,7/9/2004,Plasma,Set 4,Index34,Run2,PASS
+X82,71927,71927,Healthy Controls,29.0,Male,Asian,9/3/2004,Plasma,Set 4,Index35,Run2,PASS
+X83,71940,71940,Healthy Controls,23.0,Female,White,8/31/2004,Plasma,Set 4,Index36,Run2,PASS
+X84,71973,71973,Healthy Controls,22.0,Male,White,11/16/2004,Plasma,Set 4,Index37,Run2,PASS
+X85,71983,71983,Healthy Controls,25.0,Male,White,1/11/2005,Plasma,Set 4,Index38,Run2,PASS
+X86,72049,72049,Healthy Controls,26.0,Female,Asian,2/22/2005,Plasma,Set 4,Index39,Run2,PASS
+X87,72062,72062,Healthy Controls,25.0,Male,White,3/15/2005,Plasma,Set 4,Index40,Run2,PASS
+X88,72078,72078,Healthy Controls,21.0,Female,Asian,4/5/2005,Plasma,Set 4,Index42,Run2,PASS
+X89,72108,72108,Healthy Controls,40.0,Female,African_American,5/17/2005,Plasma,Set 4,Index43,Run2,PASS
+X90,72111,72111,Healthy Controls,33.0,Male,White,6/2/2005,Plasma,Set 4,Index44,Run2,PASS
+X91,72114,72114,Healthy Controls,26.0,Female,White,7/14/2005,Plasma,Set 4,Index45,Run2,PASS
+X92,72119,72119,Healthy Controls,36.0,Male,African_American,11/29/2005,Plasma,Set 4,Index46,Run2,PASS
+X93,72133,72133,Healthy Controls,35.0,Male,African_American,7/8/2005,Plasma,Set 4,Index47,Run2,PASS
+X95,72138,72138,Healthy Controls,22.0,Female,Multiracial,8/2/2005,Plasma,SetRecheck,Index1,Run16,PASS
+X96,72148,72148,Healthy Controls,27.0,Male,Multiracial,7/29/2005,Plasma,Set 5,Index2,Run3,PASS
+X97,72165,72165,Healthy Controls,21.0,Male,Asian,8/29/2005,Plasma,SetRecheck,Index3,Run17,PASS
+X98,72221*,72221*,Healthy Controls,40.0,Male,Asian,10/28/2005,Plasma,SetRecheck,Index16,Run18,PASS
+X99,72253*,72253*,Healthy Controls,22.0,Male,Asian,11/10/2005,Plasma,Set 5,Index5,Run3,PASS
+X100,72254*,72254*,Healthy Controls,22.0,Male,Asian,11/10/2005,Plasma,Set 5,Index6,Run3,PASS
+X101,72255*,72255*,Healthy Controls,28.0,Male,Asian,11/10/2005,Plasma,SetRecheck,Index7,Run19,PASS
+X102,72316,72316,Healthy Controls,30.0,Male,Asian,3/2/2006,Plasma,Set 5,Index8,Run3,PASS
+X103,72339*,72339*,Healthy Controls,21.0,Male,Asian,2/24/2006,Plasma,Set 5,Index9,Run3,PASS
+X104,72349*,72349*,Healthy Controls,32.0,Male,Asian,2/23/2006,Plasma,Set 5,Index10,Run3,PASS
+X105,72376,72376,Healthy Controls,25.0,Male,White,3/28/2006,Plasma,Set 5,Index11,Run3,PASS
+X106,72397,72397,Healthy Controls,27.0,Male,African_American,4/11/2006,Plasma,Set 5,Index12,Run3,PASS

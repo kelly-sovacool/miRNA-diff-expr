@@ -2,7 +2,7 @@
 title: "Differential expression analysis using DESeq2 for matched plasma & serum samples"
 output: html_notebook
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 # Match plasma & serum samples
 ```{python3}
@@ -114,12 +114,12 @@ dge <- calcNormFactors(dge)
 dge <- estimateGLMCommonDisp(dge, design)
 dge <- estimateGLMTagwiseDisp(dge, design)
 fit <- glmFit(dge, design)
-lrt <- glmLRT(fit, coef=2)
 res <- residuals(fit, type="deviance")
 set <- newSeqExpressionSet(dge$counts, phenoData=dge$samples)
-for(k in 1:10) {
-  ruvr_set <- RUVr(set, row.names(dge), k=k, res)
-  assay(reads_sce, paste("RUVr k=", toString(k))) <- log2(t(t(assayData(ruvr_set)$normalizedCounts) / colSums(assayData(ruvr_set)$normalizedCounts) * 1e6) + 1)
+ruvr_sets <- list()
+for(k in 1:5) {
+  ruvr_sets[[k]] <- RUVr(set, row.names(dge), k=k, res)
+  assay(reads_sce, paste("RUVr k=", toString(k))) <- log2(t(t(assayData(ruvr_sets[[k]])$normalizedCounts) / colSums(assayData(ruvr_sets[[k]])$normalizedCounts) * 1e6) + 1)
 }
 for(n in assayNames(reads_sce)) {
   print(
@@ -147,7 +147,7 @@ for (var in c("total_features", "Age", "Library.Generation.Set", "Index", "Parti
     )  + ggtitle(var) 
 }
 ```
-## Visualize top plasma-vs-serum miRNAs
+## Visualize top highly-expressed plasma-vs-serum miRNAs
 ```{r}
 library(RColorBrewer)
 library(reshape2)
@@ -178,17 +178,34 @@ ggplot(norm.expr.melt, aes(x=reorder(miR.ID, norm.expr, FUN=median), y=norm.expr
         panel.grid.major.x = element_blank()) + coord_flip()
 ```
 
-# Visualize EdgeR results
+# DE analysis with EdgeR
 ```{r}
-topTags(lrt)
-# TODO: filter by p-value and/or FDR
-# TODO: heatmap
+library(pheatmap)
+# based on Ryan's code, pass RUVSeq-corrected data to edgeR
+ruvr2 <- ruvr_sets[[2]]
+design <- model.matrix(~ 0 + Source + Race + Gender + Age + W_1 + W_2, pData(ruvr2))
+dge <- estimateDisp(dge, design = design, tagwise = TRUE, robust = TRUE)
+fit <- glmFit(dge, design)
+# contrast source (plasma vs serum)
+lrt <- glmLRT(fit, contrast = makeContrasts(plasma_vs_serum = SourcePlasma - SourceSerum, levels = design))
+results <- data.frame(topTags(lrt, n=Inf, sort.by="PValue", p.value=0.05))
+sig_miRs = list()
+for (logFC_threshold in 1:2) {
+  sig_miRs[[logFC_threshold]] <- rownames(results[results$PValue < 0.05 & abs(results$logFC) > logFC_threshold,])  # filter by p-value and logFC
+}
+sig_miRs[[3]] <- rownames(results[results$PValue < 0.05,][0:50,])
+# heatmaps of significant DE miRNAs
+Source <- pData(ruvr2)[,c("Source")]
+annotations <- as.data.frame(Source)
+rownames(annotations) <- rownames(pData(ruvr2))
+for(miR_list in sig_miRs) {
+  pheatmap(norm.expr.matr[miR_list,], cluster_rows=TRUE, show_rownames=TRUE, cluster_cols=TRUE, annotation_col=annotations, main="Differentially Expressed miRNAs")
+}
 ```
-
-# Run the DESeq2 pipeline & Visualize results
+# DE Analysis with DESeq2
 ```{r}
 library(DESeq2)  # TODO: use filtered & RUVSeq-corrected data
-deseq2Data <- DESeqDataSetFromMatrix(countData = counts, design = ~ Participant.ID + Source, colData = samples)
+deseq2Data <- DESeqDataSetFromMatrix(countData = dge$counts, design = ~ Participant.ID + Source, colData = dge$samples)
 deseq2Data <- DESeq(deseq2Data)
 results <- results(deseq2Data, cooksCutoff=FALSE, independentFiltering=FALSE)
 head(as.data.frame(results))
@@ -196,7 +213,7 @@ head(as.data.frame(results))
 
 ## Create a heatmap of the variance-stabilizing-transformed expression data
 ```{r}
-library(pheatmap)   # TODO: only use top DE miRNAs
+   # TODO: only use top DE miRNAs
 vstData <- varianceStabilizingTransformation(deseq2Data, blind=FALSE)  # transform the data
 select <- order(rowMeans(counts(deseq2Data,normalized=TRUE)), decreasing=TRUE)
 Source <- colData(deseq2Data)[,c("Source")]

@@ -2,7 +2,7 @@
 title: "miRNA Differential expression analysis for matched plasma & serum samples"
 output: html_notebook
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 # Match plasma & serum samples
 ```{python3}
@@ -235,15 +235,15 @@ pheatmap(sampleDistMatrix,
          col=colors)
 ```
 
-## Create a PCA plot
+## Create a PCA plot showing Age x Gender
 ```{r}
-pcaData <- plotPCA(vstData, intgroup=c("Source"), returnData=TRUE)
-percentVar <- round(100 * attr(pcaData, "percentVar"))
-ggplot(pcaData, aes(PC1, PC2, color=Source)) +
-  geom_point(size=3) +
-  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
-  ylab(paste0("PC2: ",percentVar[2],"% variance")) + 
-  coord_fixed()
+plotPCA(
+            reads_sce,
+            colour_by = "Age",
+            shape_by = "Gender",
+            size_by = "total_features",
+            exprs_values = "RUVr k= 2"
+) + ggtitle("RUVSeq-Normalized Expression (k=2)") 
 ```
 ```{r}
 save.image("diff_expr_plasma_vs_serum.RData")

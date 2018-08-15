@@ -7,5 +7,8 @@ output*
 Icon*
 *.tex
 .Rproj.user
+*.knit.md
+*.utf8.md
 tutorial*
 data/from_quickmirseq
+

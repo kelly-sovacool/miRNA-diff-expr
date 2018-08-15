@@ -56,7 +56,7 @@ head(counts)
 ## Filter
 ```{r}
 library(edgeR)
-design <- model.matrix(~0+Source+Race+Gender+Age, samples)
+design <- model.matrix(~Participant.ID + Source, samples)
 dge = DGEList(counts = counts, samples = samples)
 # require miRNAs to have CPM > 1 in at least 2 samples
 countsPerMillion <- edgeR::cpm(dge)
@@ -183,11 +183,11 @@ ggplot(norm.expr.melt, aes(x=reorder(miR.ID, norm.expr, FUN=median), y=norm.expr
 library(pheatmap)
 # based on Ryan's code, pass RUVSeq-corrected data to edgeR
 ruvr2 <- ruvr_sets[[2]]
-design <- model.matrix(~ 0 + Source + Race + Gender + Age + W_1 + W_2, pData(ruvr2))
+design <- model.matrix(~ Participant.ID + Source + W_1 + W_2, pData(ruvr2))
 dge <- estimateDisp(dge, design = design, tagwise = TRUE, robust = TRUE)
 fit <- glmFit(dge, design)
 # contrast source (plasma vs serum)
-lrt <- glmLRT(fit, contrast = makeContrasts(plasma_vs_serum = SourcePlasma - SourceSerum, levels = design))
+lrt <- glmLRT(fit, coef="SourceSerum")
 results <- data.frame(topTags(lrt, n=Inf, sort.by="PValue", p.value=0.05))
 sig_miRs = list()
 for (logFC_threshold in 1:2) {

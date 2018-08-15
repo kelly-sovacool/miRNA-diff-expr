@@ -2,7 +2,7 @@
 title: "miRNA Differential expression analysis for plasma samples"
 output: html_notebook
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 # Plasma only samples
 ```{python3}
@@ -210,7 +210,7 @@ ggplot(norm.expr.melt, aes(x=reorder(miR.ID, norm.expr, FUN=median), y=norm.expr
 library(pheatmap)
 ruvr2 <- ruvr_sets[[2]]
 norm.expr.matr <- norm.expr.matr[order(rowMeans(norm.expr.matr), decreasing=TRUE),]
-Demographics <- pData(ruvr2)[,c("Race", "Gender")]
+Demographics <- pData(ruvr2)[,c("Age","Race", "Gender")]
 annotations <- as.data.frame(Demographics)
 rownames(annotations) <- rownames(pData(ruvr2))
 pheatmap(norm.expr.matr[0:50,], cluster_rows=FALSE, show_rownames=TRUE, cluster_cols=TRUE, annotation_col=annotations, main="Top 50 Expressed miRNAs")

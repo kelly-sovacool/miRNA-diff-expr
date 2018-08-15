@@ -2,7 +2,7 @@
 title: "miRNA Differential expression analysis for plasma samples"
 output: html_notebook
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 # Plasma only samples
 ```{python3}
@@ -81,7 +81,7 @@ logcounts(reads_sce) <- log2(calculateCPM(reads_sce) + 1)
 hist(reads_sce$total_counts, breaks=100)  # counts per sample
 hist(reads_sce$total_features, breaks=100)  # counts per miRNA
 plotQC(reads_sce, type = "highest-expression")
-plotQC(reads_sce, type="explanatory-variables", variables=c("Index", "Participant.ID", "Collection.Date", "Library.Generation.Set", "MiSeq.QC.Run", 'total_features', "Age", "Race", "Sex"))
+plotQC(reads_sce, type="explanatory-variables", variables=c("Index", "Participant.ID", "Collection.Date", "Library.Generation.Set", "MiSeq.QC.Run", 'total_features', "Age", "Race", "Gender"))
 ```
 ## Examine sources of variation
 ```{r}
@@ -140,7 +140,7 @@ head(outliers)
 
 ## Examine sources of variance after removing unwanted variation
 ```{r}
-for (var in c("total_features", "Age", "Library.Generation.Set", "Index", "Participant.ID", "Source", "Race", "Gender", "Collection.Date")) {
+for (var in c("total_features", "Age", "Library.Generation.Set", "Index", "Participant.ID", "Race", "Gender", "Collection.Date")) {
   print(
     plotQC(reads_sce, type = "find-pcs", exprs_values = "RUVr k= 2", variable = var)
     )  + ggtitle(var) 
@@ -208,6 +208,7 @@ ggplot(norm.expr.melt, aes(x=reorder(miR.ID, norm.expr, FUN=median), y=norm.expr
 ## Heatmap of most highly expressed miRNAs
 ```{r}
 library(pheatmap)
+ruvr2 <- ruvr_sets[[2]]
 norm.expr.matr <- norm.expr.matr[order(rowMeans(norm.expr.matr), decreasing=TRUE),]
 Demographics <- pData(ruvr2)[,c("Race", "Gender")]
 annotations <- as.data.frame(Demographics)
@@ -243,17 +244,17 @@ for(miR_list in sig_miRs) {
 
 ## Contrast race
 ```{r}
-lrt <- glmLRT(fit, contrast=makeContrasts(asn=(Asian-(African_American+White)/2),
-                                          afr=(African_American-(Asian+White)/2),
-                                          wht=(White-(African_American+Asian)/2)), levels = design)
+lrt <- glmLRT(fit, contrast=makeContrasts(asn=(RaceAsian-(RaceAfrican_American+RaceWhite)/2),
+                                          afr=(RaceAfrican_American-(RaceAsian+RaceWhite)/2),
+                                          wht=(RaceWhite-(RaceAfrican_American+RaceAsian)/2), levels=design))
 results <- data.frame(topTags(lrt, n=Inf, sort.by="PValue", p.value=0.05))
 sig_miRs = list()
 logFC_threshold <- 1
-sig_miRs[[1]] <- rownames(results[results$PValue < 0.05 & abs(results$logFC) > logFC_threshold,])  # filter by p-value and logFC
+sig_miRs[[1]] <- rownames(results[results$PValue < 0.05 & abs(results$logFC.asn) > logFC_threshold | abs(results$logFC.afr) > logFC_threshold | abs(results$logFC.wht) > logFC_threshold,])  # filter by p-value and logFC
 sig_miRs[[2]] <- rownames(results[results$PValue < 0.05,])
 # heatmaps of significant DE miRNAs
-Race <- pData(ruvr2)[,c("Race", "Gender")]
-annotations <- as.data.frame(Race)
+Demographics <- pData(ruvr2)[,c("Race", "Gender")]
+annotations <- as.data.frame(Demographics)
 rownames(annotations) <- rownames(pData(ruvr2))
 for(miR_list in sig_miRs) {
   pheatmap(norm.expr.matr[miR_list,], cluster_rows=TRUE, show_rownames=TRUE, cluster_cols=TRUE, annotation_col=annotations, main="Differentially Expressed miRNAs")

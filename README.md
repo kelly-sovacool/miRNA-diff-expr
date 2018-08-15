@@ -1,3 +1,3 @@
 # miRNA-diff-expr
-Differential expression analysis from miRNA sequence data.
-Started using Python Jupyter notebooks, but have now transitioned to using R and R Markdown Notebooks.
+Differential expression analysis for miRNA sequence data, starting from a counts matrix.
+Started using Python Jupyter notebooks, but have now transitioned to using R Markdown Notebooks.

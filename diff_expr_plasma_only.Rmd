@@ -2,7 +2,7 @@
 title: "miRNA Differential expression analysis for plasma samples"
 output: html_notebook
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 # Plasma only samples
 ```{python3}
@@ -178,10 +178,6 @@ ggplot(norm.expr.melt, aes(x=reorder(miR.ID, norm.expr, FUN=median), y=norm.expr
 ```
 ## Visualize top highly-expressed miRNAs by Race
 ```{r}
-library(RColorBrewer)
-library(reshape2)
-# Ryan's code, modified
-norm.expr.matr <- exprs(reads_sce)
 # Rank the mean expression values for plasma/serum miRs. Highest expression = 1
 mean.expr.afr.rank <- rank(-1*rowMeans(norm.expr.matr[, colData(reads_sce)$Race=="African_American"]))
 mean.expr.asn.rank <- rank(-1*rowMeans(norm.expr.matr[, colData(reads_sce)$Race=="Asian"]))
@@ -209,9 +205,18 @@ ggplot(norm.expr.melt, aes(x=reorder(miR.ID, norm.expr, FUN=median), y=norm.expr
         panel.grid.major.x = element_blank()) + coord_flip()
 ```
 
-# DE analysis with EdgeR
+## Heatmap of most highly expressed miRNAs
 ```{r}
 library(pheatmap)
+norm.expr.matr <- norm.expr.matr[order(rowMeans(norm.expr.matr), decreasing=TRUE),]
+Demographics <- pData(ruvr2)[,c("Race", "Gender")]
+annotations <- as.data.frame(Demographics)
+rownames(annotations) <- rownames(pData(ruvr2))
+pheatmap(norm.expr.matr[0:50,], cluster_rows=FALSE, show_rownames=TRUE, cluster_cols=TRUE, annotation_col=annotations, main="Top 50 Expressed miRNAs")
+```
+
+# DE analysis with EdgeR
+```{r}
 # based on Ryan's code, pass RUVSeq-corrected data to edgeR
 ruvr2 <- ruvr_sets[[2]]
 design <- model.matrix(~ 0 + Race + Gender + Age + W_1 + W_2, pData(ruvr2))

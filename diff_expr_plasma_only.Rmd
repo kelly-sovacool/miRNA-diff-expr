@@ -227,36 +227,35 @@ fit <- glmFit(dge, design)
 
 ## Contrast gender
 ```{r}
-lrt <- glmLRT(fit, coef = "GenderMale")
-results <- data.frame(topTags(lrt, n=Inf, sort.by="PValue", p.value=0.05))
-sig_miRs = list()
+lrt_gender <- glmLRT(fit, coef = "GenderMale")
+results_gender <- data.frame(topTags(lrt_gender, n=Inf, sort.by="PValue", p.value=0.05))
+sig_miRs_gender = list()
 logFC_threshold <- 1
-sig_miRs[[1]] <- rownames(results[results$PValue < 0.05 & abs(results$logFC) > logFC_threshold,])  # filter by p-value and logFC
-sig_miRs[[2]] <- rownames(results[results$PValue < 0.05,])
+sig_miRs_gender[[1]] <- rownames(results_gender[results_gender$PValue < 0.05 & abs(results_gender$logFC) > logFC_threshold,])  # filter by p-value and logFC
+sig_miRs_gender[[2]] <- rownames(results_gender[results_gender$PValue < 0.05,])
 # heatmaps of significant DE miRNAs
 Gender <- pData(ruvr2)[,c("Gender")]
 annotations <- as.data.frame(Gender)
 rownames(annotations) <- rownames(pData(ruvr2))
-for(miR_list in sig_miRs) {
+for(miR_list in sig_miRs_gender) {
   pheatmap(norm.expr.matr[miR_list,], cluster_rows=TRUE, show_rownames=TRUE, cluster_cols=TRUE, annotation_col=annotations, main="Differentially Expressed miRNAs")
 }
 ```
 
 ## Contrast race
 ```{r}
-lrt <- glmLRT(fit, contrast=makeContrasts(asn=(RaceAsian-(RaceAfrican_American+RaceWhite)/2),
+lrt_race <- glmLRT(fit, contrast=makeContrasts(asn=(RaceAsian-(RaceAfrican_American+RaceWhite)/2),
                                           afr=(RaceAfrican_American-(RaceAsian+RaceWhite)/2),
                                           wht=(RaceWhite-(RaceAfrican_American+RaceAsian)/2), levels=design))
-results <- data.frame(topTags(lrt, n=Inf, sort.by="PValue", p.value=0.05))
-sig_miRs = list()
-logFC_threshold <- 1
-sig_miRs[[1]] <- rownames(results[results$PValue < 0.05 & abs(results$logFC.asn) > logFC_threshold | abs(results$logFC.afr) > logFC_threshold | abs(results$logFC.wht) > logFC_threshold,])  # filter by p-value and logFC
-sig_miRs[[2]] <- rownames(results[results$PValue < 0.05,])
+results_race <- data.frame(topTags(lrt_race, n=Inf, sort.by="PValue", p.value=0.05))
+sig_miRs_race = list()
+sig_miRs_race[[1]] <- rownames(results_race[results_race$PValue < 0.05 & abs(results_race$logFC.asn) > logFC_threshold | abs(results_race$logFC.afr) > logFC_threshold | abs(results_race$logFC.wht) > logFC_threshold,])  # filter by p-value and logFC
+sig_miRs_race[[2]] <- rownames(results_race[results_race$PValue < 0.05,])
 # heatmaps of significant DE miRNAs
 Demographics <- pData(ruvr2)[,c("Race", "Gender")]
 annotations <- as.data.frame(Demographics)
 rownames(annotations) <- rownames(pData(ruvr2))
-for(miR_list in sig_miRs) {
+for(miR_list in sig_miRs_race) {
   pheatmap(norm.expr.matr[miR_list,], cluster_rows=TRUE, show_rownames=TRUE, cluster_cols=TRUE, annotation_col=annotations, main="Differentially Expressed miRNAs")
 }
 ```

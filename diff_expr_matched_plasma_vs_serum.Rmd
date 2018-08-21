@@ -93,7 +93,7 @@ hist(reads_sce$total_features, breaks=100)  # counts per miRNA
 plotQC(reads_sce, type = "highest-expression") + ggtitle("Plasma & Serum")
 plotQC(plasma_sce, type = "highest-expression") + ggtitle("Plasma")
 plotQC(serum_sce, type = "highest-expression") + ggtitle("Serum")
-plotQC(reads_sce, type="explanatory-variables", variables=c("Index", "Participant.ID", "Collection.Date", "Library.Generation.Set", "MiSeq.QC.Run", "Source", 'total_features', "Age", "Race", "Sex"))
+plotQC(reads_sce, type="explanatory-variables", variables=c("Index", "Participant.ID", "Collection.Date", "Library.Generation.Set", "MiSeq.QC.Run", "Source", 'total_features', "Age", "Race", "Gender"))
 ```
 ## Examine sources of variation
 ```{r}
@@ -245,7 +245,16 @@ plotPCA(
             exprs_values = "RUVr k= 2"
 ) + ggtitle("RUVSeq-Normalized Expression (k=2)") 
 ```
+# DE Analysis with DESeq2
 ```{r}
-save.image("diff_expr_plasma_vs_serum.RData")
+library(DESeq2)
+deseq2Data <- DESeqDataSetFromMatrix(countData = dge$counts, design = ~ Participant.ID + Source + W_1 + W_2, colData = pData(ruvr2))
+deseq2Data <- DESeq(deseq2Data)
+deseq_results <- results(deseq2Data, cooksCutoff=FALSE, independentFiltering=FALSE)
+vstData <- varianceStabilizingTransformation(deseq2Data, blind=FALSE)  # transform the data
+```
+
+```{r}
+save.image("diff_expr_matched_plasma_vs_serum.RData")
 ```
 

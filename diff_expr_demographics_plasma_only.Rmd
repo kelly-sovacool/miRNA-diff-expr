@@ -272,5 +272,5 @@ plotPCA(
 ```
 
 ```{r}
-save.image("diff_expr_plasma_only.RData")
+save.image("diff_expr_demographics_plasma_only.RData")
 ```

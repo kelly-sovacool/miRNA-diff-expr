@@ -92,12 +92,37 @@ plotQC(reads_sce, type="explanatory-variables", variables=c("Index", "Participan
 
 ## Plot consistency of detected miRNAs (Fig 2C)
 ```{r}
-plasma_miRNAs <- data.frame(sample_fraction = (rowSums(plasma_counts > 0) / length(rownames(plasma_samples))))
+library(ggplot2)
+# set ggplot theme
+my_theme_bw <- theme_bw()
+theme_set(my_theme_bw)
+my_theme_bw <- theme_update(text=element_text(color="black"), axis.text=element_text(color="black", size=rel(1.0)), axis.title=element_text(color="black"), strip.text=element_text(color="black"))
+# separate data for plasma & serum
+count_plasma_samples <- length(rownames(plasma_samples))
+plasma_counts <- plasma_counts[which(rowSums(plasma_counts > 0) > 0),]
+plasma_miRNAs <- data.frame(sample_fraction = (rowSums(plasma_counts > 0) / count_plasma_samples))
 plasma_miRNAs$Source <- "Plasma"
-serum_miRNAs <- data.frame(sample_fraction = (rowSums(serum_counts > 0) / length(rownames(serum_samples))))
+count_serum_samples <- length(rownames(serum_samples))
+serum_counts <- serum_counts[which(rowSums(serum_counts > 0) > 0),]
+serum_miRNAs <- data.frame(sample_fraction = (rowSums(serum_counts > 0) / count_serum_samples))
 serum_miRNAs$Source <- "Serum"
 detected_miRNAs <- rbind(plasma_miRNAs, serum_miRNAs)
-ggplot(detected_miRNAs, aes(sample_fraction, fill=Source)) + geom_histogram(alpha=0.5, position='identity') + ggtitle("miRNA detection") + xlab("Fraction of Samples") + ylab("Number of miRNAs detected")
+ggplot(detected_miRNAs, aes(sample_fraction, fill=Source)) + geom_histogram(alpha=0.5, position='identity', bins=30) + ggtitle("miRNA detection") + xlab("Fraction of Samples") + ylab("Number of miRNAs detected")
+```
+## Plot library size distribution for plasma and serum library samples (total reads mapped to miRs)
+```{r}
+plasma_library_sizes <- data.frame(reads=colSums(plasma_counts))
+plasma_library_sizes$sample <- rownames(plasma_library_sizes)
+plasma_library_sizes$source <- "Plasma"
+ggplot(plasma_library_sizes, aes(reads)) + geom_histogram(alpha=0.5) + ggtitle("Library Size Distribution in Plasma") + xlab("Read Count") + ylab("Sample Count")
+
+serum_library_sizes <-data.frame(reads=colSums(serum_counts))
+serum_library_sizes$sample <- rownames(serum_library_sizes)
+serum_library_sizes$source <- "Serum"
+ggplot(serum_library_sizes, aes(reads)) + geom_histogram(alpha=0.5) + ggtitle("Library Size Distribution in Serum") + xlab("Read Count") + ylab("Sample Count")
+
+library_sizes_df <- rbind(serum_library_sizes, plasma_library_sizes)
+ggplot(library_sizes_df, aes(reads, fill=Source))  + geom_histogram(alpha=0.5, position='identity', bins=30) + ggtitle("Library Size Distribution") + xlab("Read Count") + ylab("Sample Count")
 ```
 
 ## Examine sources of variation
@@ -113,7 +138,6 @@ for (var in c("total_features", "Age", "Library.Generation.Set", "Index", "Parti
 ## Normalize & Remove unwanted sources of variation
 ```{r}
 library(RUVSeq)
-library(ggplot2)
 library(mvoutlier)
 dge <- calcNormFactors(dge)
 dge <- estimateGLMCommonDisp(dge, design)

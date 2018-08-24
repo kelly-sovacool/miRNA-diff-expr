@@ -68,8 +68,10 @@ reads_sce <- SingleCellExperiment(assays=list(counts=dge$counts),  colData=dge$s
 keep_feature <- rowSums(counts(reads_sce) > 0) > 0
 reads_sce <- reads_sce[keep_feature, ]
 reads_sce <- calculateQCMetrics(reads_sce)
-# create separate plasma & serum SCEs
+# create separate plasma & serum SCEs & DGEs
 plasma_samples <- subset(colData(reads_sce), Source == "Plasma")
+plasma_samples <- as.data.frame(plasma_samples)
+plasma_samples$MT.Unique.ID <- rownames(plasma_samples)
 plasma_counts <- as.data.frame(counts(reads_sce))[rownames(plasma_samples)]
 plasma_sce <- SingleCellExperiment(assays=list(counts=as.matrix(plasma_counts)), colData=plasma_samples)
 plasma_sce <- calculateQCMetrics(plasma_sce)
@@ -124,7 +126,54 @@ ggplot(serum_library_sizes, aes(reads)) + geom_histogram(alpha=0.5) + ggtitle("L
 library_sizes_df <- rbind(serum_library_sizes, plasma_library_sizes)
 ggplot(library_sizes_df, aes(reads, fill=Source))  + geom_histogram(alpha=0.5, position='identity', bins=30) + ggtitle("Library Size Distribution") + xlab("Read Count") + ylab("Sample Count")
 ```
+## Plasma Downsampling for Figure 2C to control for biases in different library sizes
+```{r}
+library(data.table)
+library(vegan)
+# DOWNSAMPLING: Plasma
+# SO REPEAT SAME PARAMS FOR EQUIMOLAR
+downsample.to.vec <- c(Inf, round(10^seq(4, 5.5, 0.5), 0))
+drr.list.plasma <- sapply(downsample.to.vec, simplify=FALSE, function(x) t(drarefy(t(plasma_counts), x)))
 
+names(drr.list.plasma) <- downsample.to.vec
+drr.all.plasma <- data.table(rbindlist(lapply(drr.list.plasma, melt), idcol=TRUE, use.names=TRUE), keep.rownames=TRUE)
+setnames(drr.all.plasma, c("downsample.to", "miR.id", "lab.libMethod.replicate", "est.prob.detected"))
+
+drr.all.plasma[, lab.libMethod.replicate:=sub("PlasmaPool", "", sub("^X", "", as.character(lab.libMethod.replicate)))]
+setkey(drr.all.plasma, lab.libMethod.replicate)
+sample.info.plasma.dt <- data.table(plasma_samples, keep.rownames = FALSE)
+sample.info.plasma.dt[, MT.Unique.ID:=sub("PlasmaPool", "", sub("^X", "", as.character(MT.Unique.ID)))]  # strip leading X from MT.Unique.ID
+names(sample.info.plasma.dt)[names(sample.info.plasma.dt) == "MT.Unique.ID"] = "lab.libMethod.replicate"
+setkey(sample.info.plasma.dt, lab.libMethod.replicate)
+drr.all.plasma.merge <- merge(drr.all.plasma, sample.info.plasma.dt)
+drr.all.plasma.merge[, downsample.to:=as.numeric(downsample.to)]
+drr.all.plasma.filt <- subset(drr.all.plasma.merge, lib.size>=downsample.to|lib.size==Inf)
+
+# plot cutoff detected
+min.prob.detected=0.90
+est.prob.detected.n.miRs <- drr.all.plasma.filt[, .(n.detected=sum(ifelse(est.prob.detected>=min.prob.detected, 1, 0)), n.not.detected=sum(ifelse(est.prob.detected>=min.prob.detected, 0, 1)), n.total=.N), by=.(lab.libMethod.replicate, lab.libMethod, downsample.to, Lab, lib.method.detail, lib.method.simple)]
+
+# Plasma miRs detected ------
+#this.outfile <- paste0(outdirs["FIG5"], "/FIG5D_miRs_detected_plasmaPool_pointsOverlaid.pdf")
+est.prob.detected.n.miRs[, downsample.to.f:=factor(round(log10(downsample.to), 1), levels=rev(downsample.to.vec))]
+g <- ggplot(est.prob.detected.n.miRs, aes( x=lib.method.simple, y=n.detected, fill=lib.method.simple)) + 
+  geom_boxplot(alpha=0.5, width=0.9, outlier.color = NA) +
+  geom_jitter(position = position_quasirandom(width = 0.4), size=0.25, alpha=0.7) +
+  facet_wrap(~downsample.to.f, nrow = 1,  labeller = label_bquote(10 ^ .(as.character(downsample.to.f)))) +
+  labs(x=NULL, y="# miRNAs detected in all samples", strip="log10 Sequencing Depth (total miRNA-mapping reads)") +
+  scale_y_continuous(breaks = seq(0,1000,100), limits=c(0,900)) +
+  theme(panel.grid.minor = element_blank(), 
+        axis.text=element_text(color="black"),
+        axis.text.x = element_text(angle=50, hjust=1, color="black"),
+        axis.line=element_line(color="black"),
+        panel.grid.major = element_blank(),
+        panel.spacing = unit(0, "lines"),
+        strip.text=element_text(size=6, color="black"),
+        axis.title=element_text(size=6, color="black"),
+        axis.ticks = element_line(color="black"),
+        legend.position = "none") ; g
+#ggsave(this.outfile, g, width = 6.25, height = 1.75); g
+```
 ## Examine sources of variation
 ```{r}
 plotPCA(reads_sce, exprs_values = "logcounts", colour_by = "Library.Generation.Set", size_by = "total_features", shape_by = "Source")

@@ -243,39 +243,59 @@ ggplot(log2_expr_df, aes(x=qcd, y=log2_median)) + geom_point() + ylab('Log2 Medi
 ggplot(log2_expr_df, aes(x=cv, y=log2_median)) + geom_point() + ylab('Log2 Median Expression') + xlab('Coefficient of Variation') + ggtitle("miRNA %CV in Plasma")
 ```
 
-## Contrast gender
+## Contrast gender (Fig3B)
 ```{r}
 lrt_gender <- glmLRT(fit, coef = "GenderMale")
-results_gender <- data.frame(topTags(lrt_gender, n=Inf, sort.by="PValue", p.value=0.05))
-sig_miRs_gender = list()
+alpha_level <- 0.05
+results_gender <- data.frame(topTags(lrt_gender, n=Inf, sort.by="PValue", p.value=alpha_level))
+sig_miRs_gender_list = list()
 logFC_threshold <- 1
-sig_miRs_gender[[1]] <- rownames(results_gender[results_gender$PValue < 0.05 & abs(results_gender$logFC) > logFC_threshold,])  # filter by p-value and logFC
-sig_miRs_gender[[2]] <- rownames(results_gender[results_gender$PValue < 0.05,])
+sig_miRs_gender_list[[1]] <- rownames(results_gender[results_gender$PValue < alpha_level & results_gender$FDR < alpha_level & abs(results_gender$logFC) > logFC_threshold,])  # filter by p-value and logFC
+sig_miRs_gender_list[[2]] <- rownames(results_gender[results_gender$PValue < alpha_level & results_gender$FDR < alpha_level,])
 # heatmaps of significant DE miRNAs
 Gender <- pData(ruvr2)[,c("Gender")]
-annotations <- as.data.frame(Gender)
-rownames(annotations) <- rownames(pData(ruvr2))
-for(miR_list in sig_miRs_gender) {
-  pheatmap(norm.expr.matr[miR_list,], cluster_rows=TRUE, show_rownames=TRUE, cluster_cols=TRUE, annotation_col=annotations, main="Differentially Expressed miRNAs")
+annotations_gender <- as.data.frame(Gender)
+rownames(annotations_gender) <- rownames(pData(ruvr2))
+for(miR_list in sig_miRs_gender_list) {
+  pheatmap(norm.expr.matr[miR_list,], cluster_rows=TRUE, show_rownames=TRUE, cluster_cols=TRUE, annotation_col=annotations_gender, main="Differentially Expressed miRNAs")
 }
+# boxplots of significant DE miRNAs
+sig_miRs_gender_table <- norm.expr.matr[sig_miRs_gender_list[[1]],]
+sig_miRs_gender_table <- melt(sig_miRs_gender_table)
+colnames(sig_miRs_gender_table) <- c("miRNA", "Sample", "Expression")
+annotations_gender$Sample <- rownames(annotations_gender)
+sig_miRs_gender_table <- merge(sig_miRs_gender_table, annotations_gender, by="Sample")
+ggplot(data = sig_miRs_gender_table, aes(x=miRNA, y=Expression)) + geom_boxplot(aes(fill=Gender)) + 
+  facet_wrap(~ miRNA, scales="free") + 
+  ggtitle("Differentially Expressed miRNAs in Plasma by Gender")
 ```
 
-## Contrast race
+## Contrast race (Fig3B)
 ```{r}
 lrt_race <- glmLRT(fit, contrast=makeContrasts(asn=(RaceAsian-(RaceAfrican_American+RaceWhite)/2),
                                           afr=(RaceAfrican_American-(RaceAsian+RaceWhite)/2),
                                           wht=(RaceWhite-(RaceAfrican_American+RaceAsian)/2), levels=design))
-results_race <- data.frame(topTags(lrt_race, n=Inf, sort.by="PValue", p.value=0.05))
-sig_miRs_race = list()
-sig_miRs_race[[1]] <- rownames(results_race[results_race$PValue < 0.05 & abs(results_race$logFC.asn) > logFC_threshold | abs(results_race$logFC.afr) > logFC_threshold | abs(results_race$logFC.wht) > logFC_threshold,])  # filter by p-value and logFC
-sig_miRs_race[[2]] <- rownames(results_race[results_race$PValue < 0.05,])
+results_race <- data.frame(topTags(lrt_race, n=Inf, sort.by="PValue", p.value=alpha_level))
+sig_miRs_race_list = list()
+sig_miRs_race_list[[1]] <- rownames(results_race[results_race$PValue < alpha_level & results_race$FDR < alpha_level & abs(results_race$logFC.asn) > logFC_threshold | abs(results_race$logFC.afr) > logFC_threshold | abs(results_race$logFC.wht) > logFC_threshold,])  # filter by p-value and logFC
+sig_miRs_race_list[[2]] <- rownames(results_race[results_race$PValue < alpha_level & results_race$FDR < alpha_level,])
 # heatmaps of significant DE miRNAs
-Demographics <- pData(ruvr2)[,c("Race", "Gender")]
-annotations <- as.data.frame(Demographics)
-rownames(annotations) <- rownames(pData(ruvr2))
-for(miR_list in sig_miRs_race) {
-  pheatmap(norm.expr.matr[miR_list,], cluster_rows=TRUE, show_rownames=TRUE, cluster_cols=TRUE, annotation_col=annotations, main="Differentially Expressed miRNAs")
+Race <- pData(ruvr2)[,c("Race")]
+annotations_race <- as.data.frame(Race)
+rownames(annotations_race) <- rownames(pData(ruvr2))
+for(miR_list in sig_miRs_race_list) {
+  pheatmap(norm.expr.matr[miR_list,], cluster_rows=TRUE, show_rownames=TRUE, cluster_cols=TRUE, annotation_col=annotations_race, main="Differentially Expressed miRNAs")
 }
+# boxplots of significant DE miRNAs
+sig_miRs_race_table <- norm.expr.matr[sig_miRs_race_list[[1]],]
+sig_miRs_race_table <- melt(sig_miRs_race_table)
+colnames(sig_miRs_race_table) <- c("miRNA", "Sample", "Expression")
+annotations_race$Sample <- rownames(annotations_race)
+sig_miRs_race_table <- merge(sig_miRs_race_table, annotations_race, by="Sample")
+sig_miRs_race_table <- sig_miRs_race_table[sig_miRs_race_table$Race != "Multiracial" & sig_miRs_race_table$Race != "Pacific_Islander",] # Pacific_Islander and Multiracial have too small sample sizes
+ggplot(data = sig_miRs_race_table, aes(x=miRNA, y=Expression)) + geom_boxplot(aes(fill=Race)) + 
+  facet_wrap(~ miRNA, scales="free") + 
+  ggtitle("Differentially Expressed miRNAs in Plasma by Race")
 ```
 
 ## Create a PCA plot showing Age x Gender

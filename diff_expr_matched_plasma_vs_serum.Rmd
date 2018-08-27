@@ -2,7 +2,7 @@
 title: "miRNA Differential expression analysis for matched plasma & serum samples"
 output: html_notebook
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 # Match plasma & serum samples
 ```{python3}
@@ -188,12 +188,13 @@ dge <- estimateDisp(dge, design = design, tagwise = TRUE, robust = TRUE)
 fit <- glmFit(dge, design)
 # contrast source (plasma vs serum)
 lrt <- glmLRT(fit, coef="SourceSerum")
-results <- data.frame(topTags(lrt, n=Inf, sort.by="PValue", p.value=0.05))
+alpha_level <- 0.05
+results <- data.frame(topTags(lrt, n=Inf, sort.by="PValue", p.value=alpha_level))
 sig_miRs = list()
 for (logFC_threshold in 1:2) {
-  sig_miRs[[logFC_threshold]] <- rownames(results[results$PValue < 0.05 & abs(results$logFC) > logFC_threshold,])  # filter by p-value and logFC
+  sig_miRs[[logFC_threshold]] <- rownames(results[results$PValue < alpha_level & results$FDR < alpha_level & abs(results$logFC) > logFC_threshold,])  # filter by p-value and logFC
 }
-sig_miRs[[3]] <- rownames(results[results$PValue < 0.05,][0:50,])
+sig_miRs[[3]] <- rownames(results[results$PValue < alpha_level & results$FDR < alpha_level,][0:50,])
 # heatmaps of significant DE miRNAs
 Source <- pData(ruvr2)[,c("Source")]
 annotations <- as.data.frame(Source)
@@ -204,11 +205,12 @@ for(miR_list in sig_miRs) {
 ```
 # DE Analysis with DESeq2
 ```{r}
-library(DESeq2)  # TODO: use filtered & RUVSeq-corrected data
-deseq2Data <- DESeqDataSetFromMatrix(countData = dge$counts, design = ~ Participant.ID + Source, colData = dge$samples)
+library(DESeq2)
+# use filtered and RUVr-corrected data
+deseq2Data <- DESeqDataSetFromMatrix(countData = dge$counts, design = ~ Participant.ID + Source + W_1 + W_2, colData = pData(ruvr2))
 deseq2Data <- DESeq(deseq2Data)
-results <- results(deseq2Data, cooksCutoff=FALSE, independentFiltering=FALSE)
-head(as.data.frame(results))
+deseq_results <- results(deseq2Data, cooksCutoff=FALSE, independentFiltering=FALSE)
+vstData <- varianceStabilizingTransformation(deseq2Data, blind=FALSE)  # transform the data
 ```
 
 ## Create a heatmap of the variance-stabilizing-transformed expression data
@@ -244,14 +246,6 @@ plotPCA(
             size_by = "total_features",
             exprs_values = "RUVr k= 2"
 ) + ggtitle("RUVSeq-Normalized Expression (k=2)") 
-```
-# DE Analysis with DESeq2
-```{r}
-library(DESeq2)
-deseq2Data <- DESeqDataSetFromMatrix(countData = dge$counts, design = ~ Participant.ID + Source + W_1 + W_2, colData = pData(ruvr2))
-deseq2Data <- DESeq(deseq2Data)
-deseq_results <- results(deseq2Data, cooksCutoff=FALSE, independentFiltering=FALSE)
-vstData <- varianceStabilizingTransformation(deseq2Data, blind=FALSE)  # transform the data
 ```
 
 ```{r}

@@ -45,54 +45,14 @@ samples$X <- NULL
 counts <- counts[,rownames(samples)]
 head(samples)
 head(counts)
-```
-
-## Filter
-```{r}
-library(edgeR)
-design <- model.matrix(~Source, samples)
-dge = DGEList(counts = counts, samples = samples)
-# require miRNAs to have CPM > 1 in at least 2 samples
-countsPerMillion <- edgeR::cpm(dge)
-countCheck <- countsPerMillion > 1
-head(countCheck)
-keep <- which(rowSums(countCheck) >= 2) 
-dge <- dge[keep,]
-```
-## Explore variance
-```{r}
-library(SingleCellExperiment)
-library(scater)
-reads_sce <- SingleCellExperiment(assays=list(counts=dge$counts),  colData=dge$samples)
-# remove unexpressed miRNAs
-keep_feature <- rowSums(counts(reads_sce) > 0) > 0
-reads_sce <- reads_sce[keep_feature, ]
-reads_sce <- calculateQCMetrics(reads_sce)
-# create separate plasma & serum SCEs & DGEs
-plasma_samples <- subset(colData(reads_sce), Source == "Plasma")
-plasma_samples <- as.data.frame(plasma_samples)
+plasma_samples <- subset(samples, Source=="Plasma")
+serum_samples <- subset(samples, Source=="Serum")
 plasma_samples$MT.Unique.ID <- rownames(plasma_samples)
-plasma_counts <- as.data.frame(counts(reads_sce))[rownames(plasma_samples)]
-plasma_sce <- SingleCellExperiment(assays=list(counts=as.matrix(plasma_counts)), colData=plasma_samples)
-plasma_sce <- calculateQCMetrics(plasma_sce)
-serum_samples <- subset(colData(reads_sce), Source == "Serum")
-serum_counts <- as.data.frame(counts(reads_sce))[rownames(serum_samples)]
-serum_sce <- SingleCellExperiment(assays=list(counts=as.matrix(serum_counts)), colData=serum_samples)
-serum_sce <- calculateQCMetrics(serum_sce)
-# log transform
-cpm(reads_sce) <- calculateCPM(reads_sce)
-reads_sce <- normalize(reads_sce)
-logcounts(reads_sce) <- log2(calculateCPM(reads_sce) + 1)
-# visualize
-hist(reads_sce$total_counts, breaks=100)  # counts per sample
-hist(reads_sce$total_features, breaks=100)  # counts per miRNA
-plotQC(reads_sce, type = "highest-expression") + ggtitle("Plasma & Serum")
-plotQC(plasma_sce, type = "highest-expression") + ggtitle("Plasma")
-plotQC(serum_sce, type = "highest-expression") + ggtitle("Serum")
-plotQC(reads_sce, type="explanatory-variables", variables=c("Index", "Participant.ID", "Collection.Date", "Library.Generation.Set", "MiSeq.QC.Run", "Source", 'total_features', "Age", "Race", "Gender"))
+serum_samples$MT.Unique.ID <- rownames(serum_samples)
+plasma_counts <- counts[rownames(plasma_samples)]
+serum_counts <- counts[rownames(serum_samples)]
 ```
-
-## Plot consistency of detected miRNAs (Fig 2C)
+# Plot consistency of detected miRNAs (Fig 2C)
 ```{r}
 library(ggplot2)
 # set ggplot theme
@@ -101,11 +61,11 @@ theme_set(my_theme_bw)
 my_theme_bw <- theme_update(text=element_text(color="black"), axis.text=element_text(color="black", size=rel(1.0)), axis.title=element_text(color="black"), strip.text=element_text(color="black"))
 # separate data for plasma & serum
 count_plasma_samples <- length(rownames(plasma_samples))
-plasma_counts <- plasma_counts[which(rowSums(plasma_counts > 0) > 0),]
+#plasma_counts <- plasma_counts[which(rowSums(plasma_counts > 0) > 0),]
 plasma_miRNAs <- data.frame(sample_fraction = (rowSums(plasma_counts > 0) / count_plasma_samples))
 plasma_miRNAs$Source <- "Plasma"
 count_serum_samples <- length(rownames(serum_samples))
-serum_counts <- serum_counts[which(rowSums(serum_counts > 0) > 0),]
+#serum_counts <- serum_counts[which(rowSums(serum_counts > 0) > 0),]
 serum_miRNAs <- data.frame(sample_fraction = (rowSums(serum_counts > 0) / count_serum_samples))
 serum_miRNAs$Source <- "Serum"
 detected_miRNAs <- rbind(plasma_miRNAs, serum_miRNAs)
@@ -131,34 +91,35 @@ ggplot(library_sizes_df, aes(reads, fill=Source))  + geom_histogram(alpha=0.5, p
 library(data.table)
 library(vegan)
 # DOWNSAMPLING: Plasma
-# SO REPEAT SAME PARAMS FOR EQUIMOLAR
 downsample.to.vec <- c(Inf, round(10^seq(4, 5.5, 0.5), 0))
 drr.list.plasma <- sapply(downsample.to.vec, simplify=FALSE, function(x) t(drarefy(t(plasma_counts), x)))
 
 names(drr.list.plasma) <- downsample.to.vec
 drr.all.plasma <- data.table(rbindlist(lapply(drr.list.plasma, melt), idcol=TRUE, use.names=TRUE), keep.rownames=TRUE)
-setnames(drr.all.plasma, c("downsample.to", "miR.id", "lab.libMethod.replicate", "est.prob.detected"))
-
-drr.all.plasma[, lab.libMethod.replicate:=sub("PlasmaPool", "", sub("^X", "", as.character(lab.libMethod.replicate)))]
-setkey(drr.all.plasma, lab.libMethod.replicate)
-sample.info.plasma.dt <- data.table(plasma_samples, keep.rownames = FALSE)
-sample.info.plasma.dt[, MT.Unique.ID:=sub("PlasmaPool", "", sub("^X", "", as.character(MT.Unique.ID)))]  # strip leading X from MT.Unique.ID
-names(sample.info.plasma.dt)[names(sample.info.plasma.dt) == "MT.Unique.ID"] = "lab.libMethod.replicate"
-setkey(sample.info.plasma.dt, lab.libMethod.replicate)
-drr.all.plasma.merge <- merge(drr.all.plasma, sample.info.plasma.dt)
+setnames(drr.all.plasma, c("downsample.to", "miR.id", "MT.Unique.ID", "est.prob.detected"))
+plasma_samples$lib.size <- NA
+for(mt_unique_id in rownames(plasma_samples)) {
+  plasma_samples[mt_unique_id, "lib.size"] <- sum(plasma_counts[mt_unique_id])
+}
+drr.all.plasma.merge <- merge(drr.all.plasma, plasma_samples)
 drr.all.plasma.merge[, downsample.to:=as.numeric(downsample.to)]
 drr.all.plasma.filt <- subset(drr.all.plasma.merge, lib.size>=downsample.to|lib.size==Inf)
 
 # plot cutoff detected
 min.prob.detected=0.90
-est.prob.detected.n.miRs <- drr.all.plasma.filt[, .(n.detected=sum(ifelse(est.prob.detected>=min.prob.detected, 1, 0)), n.not.detected=sum(ifelse(est.prob.detected>=min.prob.detected, 0, 1)), n.total=.N), by=.(lab.libMethod.replicate, lab.libMethod, downsample.to, Lab, lib.method.detail, lib.method.simple)]
+est.prob.detected.n.miRs <- drr.all.plasma.filt[,
+                                                .(n.detected=.N[est.prob.detected>min.prob.detected],
+                                                  n.not.detected=.N[est.prob.detected<=min.prob.detected],
+                                                  n.total=.N),
+                                                by=.(MT.Unique.ID,downsample.to,Source)]
+# Plasma miRs detected
+est.prob.detected.n.miRs.log10 <- est.prob.detected.n.miRs[, downsample.to.f:=factor(round(log10(downsample.to), 1), levels=rev(downsample.to.vec))]
+ggplot(est.prob.detected.n.miRs.log10, aes( x=downsample.to, y=n.detected)) + 
+  geom_boxplot(aes(group=downsample.to)) + ggtitle("Library Downsampling")
 
-# Plasma miRs detected ------
-#this.outfile <- paste0(outdirs["FIG5"], "/FIG5D_miRs_detected_plasmaPool_pointsOverlaid.pdf")
-est.prob.detected.n.miRs[, downsample.to.f:=factor(round(log10(downsample.to), 1), levels=rev(downsample.to.vec))]
-g <- ggplot(est.prob.detected.n.miRs, aes( x=lib.method.simple, y=n.detected, fill=lib.method.simple)) + 
+'g <- ggplot(est.prob.detected.n.miRs, aes( x=downsample.to, y=n.detected, fill=Source)) + 
   geom_boxplot(alpha=0.5, width=0.9, outlier.color = NA) +
-  geom_jitter(position = position_quasirandom(width = 0.4), size=0.25, alpha=0.7) +
+  #geom_jitter(position = position_quasirandom(width = 0.4), size=0.25, alpha=0.7) +
   facet_wrap(~downsample.to.f, nrow = 1,  labeller = label_bquote(10 ^ .(as.character(downsample.to.f)))) +
   labs(x=NULL, y="# miRNAs detected in all samples", strip="log10 Sequencing Depth (total miRNA-mapping reads)") +
   scale_y_continuous(breaks = seq(0,1000,100), limits=c(0,900)) +
@@ -172,8 +133,57 @@ g <- ggplot(est.prob.detected.n.miRs, aes( x=lib.method.simple, y=n.detected, fi
         axis.title=element_text(size=6, color="black"),
         axis.ticks = element_line(color="black"),
         legend.position = "none") ; g
-#ggsave(this.outfile, g, width = 6.25, height = 1.75); g
+#this.outfile <- paste0(outdirs["FIG5"], "/FIG5D_miRs_detected_plasmaPool_pointsOverlaid.pdf")
+#ggsave(this.outfile, g, width = 6.25, height = 1.75); g'
 ```
+
+# Filter
+```{r}
+library(edgeR)
+design <- model.matrix(~Source, samples)
+dge = DGEList(counts = counts, samples = samples)
+# require miRNAs to have CPM > 1 in at least 2 samples
+countsPerMillion <- edgeR::cpm(dge)
+countCheck <- countsPerMillion > 1
+head(countCheck)
+keep <- which(rowSums(countCheck) >= 2) 
+dge <- dge[keep,]
+```
+# Explore variance
+```{r}
+library(SingleCellExperiment)
+library(scater)
+reads_sce <- SingleCellExperiment(assays=list(counts=dge$counts),  colData=dge$samples)
+# remove unexpressed miRNAs
+keep_feature <- rowSums(counts(reads_sce) > 0) > 0
+reads_sce <- reads_sce[keep_feature, ]
+reads_sce <- calculateQCMetrics(reads_sce)
+# create separate plasma & serum SCEs & DGEs
+#plasma_samples <- subset(colData(reads_sce), Source == "Plasma")
+#plasma_samples <- as.data.frame(plasma_samples)
+#plasma_samples$MT.Unique.ID <- rownames(plasma_samples)
+#plasma_counts <- as.data.frame(counts(reads_sce))[rownames(plasma_samples)]
+plasma_sce <- SingleCellExperiment(assays=list(counts=as.matrix(plasma_counts)), colData=plasma_samples)
+plasma_sce <- calculateQCMetrics(plasma_sce)
+#serum_samples <- subset(colData(reads_sce), Source == "Serum")
+#serum_counts <- as.data.frame(counts(reads_sce))[rownames(serum_samples)]
+serum_sce <- SingleCellExperiment(assays=list(counts=as.matrix(serum_counts)), colData=serum_samples)
+serum_sce <- calculateQCMetrics(serum_sce)
+# log transform
+cpm(reads_sce) <- calculateCPM(reads_sce)
+reads_sce <- normalize(reads_sce)
+logcounts(reads_sce) <- log2(calculateCPM(reads_sce) + 1)
+# visualize
+hist(reads_sce$total_counts, breaks=100)  # counts per sample
+hist(reads_sce$total_features, breaks=100)  # counts per miRNA
+plotQC(reads_sce, type = "highest-expression") + ggtitle("Plasma & Serum")
+plotQC(plasma_sce, type = "highest-expression") + ggtitle("Plasma")
+plotQC(serum_sce, type = "highest-expression") + ggtitle("Serum")
+plotQC(reads_sce, type="explanatory-variables", variables=c("Index", "Participant.ID", "Collection.Date", "Library.Generation.Set", "MiSeq.QC.Run", "Source", 'total_features', "Age", "Race", "Gender"))
+```
+
+
+
 ## Examine sources of variation
 ```{r}
 plotPCA(reads_sce, exprs_values = "logcounts", colour_by = "Library.Generation.Set", size_by = "total_features", shape_by = "Source")
@@ -225,7 +235,7 @@ for (var in c("total_features", "Age", "Library.Generation.Set", "Index", "Parti
     )  + ggtitle(var) 
 }
 ```
-## Visualize top highly-expressed plasma-vs-serum miRNAs
+# Visualize top highly-expressed plasma-vs-serum miRNAs
 ```{r}
 library(RColorBrewer)
 library(reshape2)
@@ -268,8 +278,9 @@ fit <- glmFit(dge, design)
 lrt <- glmLRT(fit, coef="SourceSerum")
 results <- data.frame(topTags(lrt, n=Inf, sort.by="PValue", p.value=0.05))
 sig_miRs = list()
+alpha_level <- 0.05
 for (logFC_threshold in 1:2) {
-  sig_miRs[[logFC_threshold]] <- rownames(results[results$PValue < 0.05 & abs(results$logFC) > logFC_threshold,])  # filter by p-value and logFC
+  sig_miRs[[logFC_threshold]] <- rownames(results[results$PValue < alpha_level & results$FDR < alpha_level & abs(results$logFC) > logFC_threshold,])  # filter by p-value and logFC
 }
 sig_miRs[[3]] <- rownames(results[results$PValue < 0.05,][0:50,])
 # heatmaps of significant DE miRNAs

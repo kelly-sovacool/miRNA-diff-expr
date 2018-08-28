@@ -91,19 +91,29 @@ ggplot(library_sizes_df, aes(reads, fill=Source))  + geom_histogram(alpha=0.5, p
 library(data.table)
 library(vegan)
 # DOWNSAMPLING: Plasma
-downsample.to.vec <- c(Inf, round(10^seq(4, 5.5, 0.5, 6), 0))
+downsample.to.vec <- c(Inf, round(10^seq(4, 6, 0.5), 0))
 drr.list.plasma <- sapply(downsample.to.vec, simplify=FALSE, function(x) t(drarefy(t(plasma_counts), x)))
-
+drr.list.serum <- sapply(downsample.to.vec, simplify=FALSE, function(x) t(drarefy(t(serum_counts), x)))
 names(drr.list.plasma) <- downsample.to.vec
+names(drr.list.serum) <- downsample.to.vec
 drr.all.plasma <- data.table(rbindlist(lapply(drr.list.plasma, melt), idcol=TRUE, use.names=TRUE), keep.rownames=TRUE)
+drr.all.serum <- data.table(rbindlist(lapply(drr.list.serum, melt), idcol=TRUE, use.names=TRUE), keep.rownames=TRUE)
 setnames(drr.all.plasma, c("downsample.to", "miR.id", "MT.Unique.ID", "est.prob.detected"))
+setnames(drr.all.serum, c("downsample.to", "miR.id", "MT.Unique.ID", "est.prob.detected"))
 plasma_samples$lib.size <- NA
 for(mt_unique_id in rownames(plasma_samples)) {
   plasma_samples[mt_unique_id, "lib.size"] <- sum(plasma_counts[mt_unique_id])
 }
+serum_samples$lib.size <- NA
+for(mt_unique_id in rownames(serum_samples)) {
+  serum_samples[mt_unique_id, "lib.size"] <- sum(serum_counts[mt_unique_id])
+}
 drr.all.plasma.merge <- merge(drr.all.plasma, plasma_samples)
+drr.all.serum.merge <- merge(drr.all.serum, serum_samples)
 drr.all.plasma.merge[, downsample.to:=as.numeric(downsample.to)]
+drr.all.serum.merge[, downsample.to:=as.numeric(downsample.to)]
 drr.all.plasma.filt <- subset(drr.all.plasma.merge, lib.size>=downsample.to|lib.size==Inf)
+drr.all.serum.filt <- subset(drr.all.serum.merge, lib.size>=downsample.to|lib.size==Inf)
 
 # plot cutoff detected
 min.prob.detected=0.90
@@ -112,10 +122,16 @@ est.prob.detected.n.miRs.plasma <- drr.all.plasma.filt[,
                                                   n.not.detected=sum(ifelse(est.prob.detected<=min.prob.detected, 1, 0)),
                                                   n.total=.N),
                                                 by=.(MT.Unique.ID,downsample.to,Source)]
+est.prob.detected.n.miRs.serum <- drr.all.serum.filt[,
+                                               .(n.detected=sum(ifelse(est.prob.detected>min.prob.detected, 1, 0)),
+                                                  n.not.detected=sum(ifelse(est.prob.detected<=min.prob.detected, 1, 0)),
+                                                  n.total=.N),
+                                                by=.(MT.Unique.ID,downsample.to,Source)]
+est.prob.detected.n.miRs <- rbind(est.prob.detected.n.miRs.plasma, est.prob.detected.n.miRs.serum)
 # Plasma miRs detected
-est.prob.detected.n.miRs.plasma$downsample.to.char <- paste("10^", as.character(round(log10(est.prob.detected.n.miRs.plasma$downsample.to), 1)), sep='')
-ggplot(est.prob.detected.n.miRs.plasma, aes( x=downsample.to.char, y=n.detected)) + 
-  geom_boxplot(aes(group=downsample.to)) + ggtitle("Library Downsampling") + ylab('miRNAs Detected') + xlab('Library Downsample Size')
+est.prob.detected.n.miRs$downsample.to.char <- paste("10^", as.character(round(log10(est.prob.detected.n.miRs$downsample.to), 1)), sep='')
+ggplot(est.prob.detected.n.miRs, aes( x=downsample.to.char, y=n.detected, fill=Source)) + 
+  geom_boxplot(pos="dodge") + ggtitle("Library Downsampling") + ylab('miRNAs Detected') + xlab('Library Downsample Size')
 ```
 
 # Filter

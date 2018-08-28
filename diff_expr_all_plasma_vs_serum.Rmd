@@ -116,25 +116,6 @@ est.prob.detected.n.miRs <- drr.all.plasma.filt[,
 est.prob.detected.n.miRs.log10 <- est.prob.detected.n.miRs[, downsample.to.f:=factor(round(log10(downsample.to), 1), levels=rev(downsample.to.vec))]
 ggplot(est.prob.detected.n.miRs.log10, aes( x=downsample.to, y=n.detected)) + 
   geom_boxplot(aes(group=downsample.to)) + ggtitle("Library Downsampling") + ylab('miRNAs Detected') + xlab('Library Downsample Size')
-
-'g <- ggplot(est.prob.detected.n.miRs, aes( x=downsample.to, y=n.detected, fill=Source)) + 
-  geom_boxplot(alpha=0.5, width=0.9, outlier.color = NA) +
-  #geom_jitter(position = position_quasirandom(width = 0.4), size=0.25, alpha=0.7) +
-  facet_wrap(~downsample.to.f, nrow = 1,  labeller = label_bquote(10 ^ .(as.character(downsample.to.f)))) +
-  labs(x=NULL, y="# miRNAs detected in all samples", strip="log10 Sequencing Depth (total miRNA-mapping reads)") +
-  scale_y_continuous(breaks = seq(0,1000,100), limits=c(0,900)) +
-  theme(panel.grid.minor = element_blank(), 
-        axis.text=element_text(color="black"),
-        axis.text.x = element_text(angle=50, hjust=1, color="black"),
-        axis.line=element_line(color="black"),
-        panel.grid.major = element_blank(),
-        panel.spacing = unit(0, "lines"),
-        strip.text=element_text(size=6, color="black"),
-        axis.title=element_text(size=6, color="black"),
-        axis.ticks = element_line(color="black"),
-        legend.position = "none") ; g
-#this.outfile <- paste0(outdirs["FIG5"], "/FIG5D_miRs_detected_plasmaPool_pointsOverlaid.pdf")
-#ggsave(this.outfile, g, width = 6.25, height = 1.75); g'
 ```
 
 # Filter

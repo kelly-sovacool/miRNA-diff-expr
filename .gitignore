@@ -1,4 +1,3 @@
-*.RData
 *.RDataTmp
 output*
 .DS_Store

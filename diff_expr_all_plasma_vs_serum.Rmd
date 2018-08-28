@@ -91,7 +91,7 @@ ggplot(library_sizes_df, aes(reads, fill=Source))  + geom_histogram(alpha=0.5, p
 library(data.table)
 library(vegan)
 # DOWNSAMPLING: Plasma
-downsample.to.vec <- c(Inf, round(10^seq(4, 5.5, 0.5), 0))
+downsample.to.vec <- c(Inf, round(10^seq(4, 5.5, 0.5, 6), 0))
 drr.list.plasma <- sapply(downsample.to.vec, simplify=FALSE, function(x) t(drarefy(t(plasma_counts), x)))
 
 names(drr.list.plasma) <- downsample.to.vec
@@ -107,14 +107,14 @@ drr.all.plasma.filt <- subset(drr.all.plasma.merge, lib.size>=downsample.to|lib.
 
 # plot cutoff detected
 min.prob.detected=0.90
-est.prob.detected.n.miRs <- drr.all.plasma.filt[,
+est.prob.detected.n.miRs.plasma <- drr.all.plasma.filt[,
                                                .(n.detected=sum(ifelse(est.prob.detected>min.prob.detected, 1, 0)),
                                                   n.not.detected=sum(ifelse(est.prob.detected<=min.prob.detected, 1, 0)),
                                                   n.total=.N),
                                                 by=.(MT.Unique.ID,downsample.to,Source)]
 # Plasma miRs detected
-est.prob.detected.n.miRs.log10 <- est.prob.detected.n.miRs[, downsample.to.f:=factor(round(log10(downsample.to), 1), levels=rev(downsample.to.vec))]
-ggplot(est.prob.detected.n.miRs.log10, aes( x=downsample.to, y=n.detected)) + 
+est.prob.detected.n.miRs.plasma$downsample.to.char <- paste("10^", as.character(round(log10(est.prob.detected.n.miRs.plasma$downsample.to), 1)), sep='')
+ggplot(est.prob.detected.n.miRs.plasma, aes( x=downsample.to.char, y=n.detected)) + 
   geom_boxplot(aes(group=downsample.to)) + ggtitle("Library Downsampling") + ylab('miRNAs Detected') + xlab('Library Downsample Size')
 ```
 

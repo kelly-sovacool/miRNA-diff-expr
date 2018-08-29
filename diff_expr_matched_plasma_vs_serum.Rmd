@@ -2,7 +2,7 @@
 title: "miRNA Differential expression analysis for matched plasma & serum samples"
 output: html_notebook
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 # Match plasma & serum samples
 ```{python3}
@@ -195,6 +195,8 @@ for (logFC_threshold in 1:2) {
   sig_miRs[[logFC_threshold]] <- rownames(results[results$PValue < alpha_level & results$FDR < alpha_level & abs(results$logFC) > logFC_threshold,])  # filter by p-value and logFC
 }
 sig_miRs[[3]] <- rownames(results[results$PValue < alpha_level & results$FDR < alpha_level,][0:50,])
+results_sorted_fdr <- results[order(results$FDR),]
+sig_miRs[[4]] <- rownames(results_sorted_fdr[results_sorted_fdr$FDR < alpha_level,][0:50,])
 # heatmaps of significant DE miRNAs
 Source <- pData(ruvr2)[,c("Source")]
 annotations <- as.data.frame(Source)

@@ -166,12 +166,12 @@ for (row_num in 1:nrow(norm.expr.melt)){  # Pull the Gender values from the colu
   norm.expr.melt[row_num, "Gender"] <- as.character(samples[mt_unique_id,"Gender"])
 }
 # This would be a simple boxplot with plasma/serum side-by-side. Overlaying the boxes over points takes a little more tweaking to get the dodge/width right, but it's doable.
-ggplot(norm.expr.melt, aes(x=reorder(miR.ID, norm.expr, FUN=median), y=norm.expr, fill=Gender)) + geom_boxplot(pos="dodge", outlier.size=0.5) + 
+ggplot(norm.expr.melt, aes(x=reorder(miR.ID, norm.expr, FUN = "median"), y=norm.expr, fill=Gender)) + geom_boxplot(pos="dodge", outlier.size=0.5) + 
   ggtitle("Top 20 Expressed miRNAs") + ylab("Normalized Expression") + xlab("miRNA ID") + 
   theme(panel.grid.major.x = element_line(size = 0.5, linetype = 'solid', colour = "grey"), 
         panel.grid.major.y = element_blank(),
         axis.text.x = element_text(angle = 90, hjust = 1))
-ggplot(norm.expr.melt, aes(x=reorder(miR.ID, norm.expr, FUN=median), y=norm.expr, fill=Gender)) + geom_boxplot(pos="dodge", outlier.size=0.5) + 
+ggplot(norm.expr.melt, aes(x=reorder(miR.ID, norm.expr, FUN="median"), y=norm.expr, fill=Gender)) + geom_boxplot(pos="dodge", outlier.size=0.5) + 
   ggtitle("Top 20 Expressed miRNAs") + ylab("Normalized Expression") + xlab("miRNA ID") + 
   theme(panel.grid.major.y = element_line(size = 0.5, linetype = 'solid', colour = "grey"), 
         panel.grid.major.x = element_blank()) + coord_flip()
@@ -194,12 +194,12 @@ for (row_num in 1:nrow(norm.expr.melt)){  # Pull the Gender values from the colu
 }
 norm.expr.melt <- norm.expr.melt[norm.expr.melt$Race %in% c("African_American", "Asian", "White"),]
 # This would be a simple boxplot with plasma/serum side-by-side. Overlaying the boxes over points takes a little more tweaking to get the dodge/width right, but it's doable.
-ggplot(norm.expr.melt, aes(x=reorder(miR.ID, norm.expr, FUN=median), y=norm.expr, fill=Race)) + geom_boxplot(pos="dodge", outlier.size=0.5) + 
+ggplot(norm.expr.melt, aes(x=reorder(miR.ID, norm.expr, FUN="median"), y=norm.expr, fill=Race)) + geom_boxplot(pos="dodge", outlier.size=0.5) + 
   ggtitle("Top 20 Expressed miRNAs") + ylab("Normalized Expression") + xlab("miRNA ID") + 
   theme(panel.grid.major.x = element_line(size = 0.5, linetype = 'solid', colour = "grey"), 
         panel.grid.major.y = element_blank(),
         axis.text.x = element_text(angle = 90, hjust = 1))
-ggplot(norm.expr.melt, aes(x=reorder(miR.ID, norm.expr, FUN=median), y=norm.expr, fill=Race)) + geom_boxplot(pos="dodge", outlier.size=0.5) + 
+ggplot(norm.expr.melt, aes(x=reorder(miR.ID, norm.expr, FUN="median"), y=norm.expr, fill=Race)) + geom_boxplot(pos="dodge", outlier.size=0.5) + 
   ggtitle("Top 20 Expressed miRNAs") + ylab("Normalized Expression") + xlab("miRNA ID") + 
   theme(panel.grid.major.y = element_line(size = 0.5, linetype = 'solid', colour = "grey"), 
         panel.grid.major.x = element_blank()) + coord_flip()
@@ -228,6 +228,7 @@ fit <- glmFit(dge, design)
 ## Core miRNAs stable across individuals (Fig2D)
 ```{r}
 ruvr_norm_matrix <- assayData(ruvr2)$normalizedCounts
+#ruvr_norm_matrix <- counts
 median <- apply(ruvr_norm_matrix, 1, median)
 median_expr_df <- as.data.frame(median)
 median_expr_df$qcd <- apply(ruvr_norm_matrix, 1, FUN=function(x){ q <- quantile(x, c(0.25, 0.75)); diff(q)/sum(q) })  # quartile coeff. of dispersion
